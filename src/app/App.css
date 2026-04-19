@@ -567,3 +567,125 @@ button:hover {
   cursor: pointer;
   font-size: 1rem;
 }
+
+/* CHECKOUT STYLES */
+.form-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.form-section h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.delivery-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.delivery-option {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.delivery-option.selected {
+  border-color: #007AFF;
+  background: #f0f7ff;
+}
+
+.delivery-option input[type="radio"] {
+  display: none;
+}
+
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.option-icon {
+  font-size: 2rem;
+}
+
+.option-content strong {
+  display: block;
+  color: #333;
+}
+
+.option-content p {
+  margin: 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.delivery-cost {
+  color: #FF9500;
+  font-weight: 600;
+}
+
+.payment-info {
+  background: #fff8e1;
+  border: 1px solid #FFD700;
+}
+
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.payment-methods span {
+  background: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  border: 1px solid #ddd;
+}
+
+.payment-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #FF9500;
+  font-weight: 500;
+}
+
+.summary-divider {
+  border-top: 1px dashed #ddd;
+  margin: 0.75rem 0;
+}
+
+.whatsapp-btn {
+  width: 100%;
+  padding: 1.2rem;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-btn:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+}
+
+.whatsapp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
