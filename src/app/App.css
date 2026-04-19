@@ -689,3 +689,34 @@ button:hover {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* PANELS */
+.panel-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+  backdrop-filter: blur(5px);
+}
+
+.admin-panel, .order-panel {
+  background: white;
+  border-radius: 16px;
+  width: 95vw;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid #eee;
+  background: linear-gradient(135deg, #667eea, #764baa)
+}

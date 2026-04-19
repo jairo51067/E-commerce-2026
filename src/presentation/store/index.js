@@ -51,6 +51,35 @@ export const useStore = create(
 
       clearCart: () => set({ cart: [] }),
 
+      // PRODUCTS CRUD
+addProduct: (product) => set((state) => ({
+  products: [...state.products, product]
+})),
+
+editProduct: (updatedProduct) => set((state) => ({
+  products: state.products.map(p =>
+    p.id === updatedProduct.id ? updatedProduct : p
+  )
+})),
+
+deleteProduct: (productId) => set((state) => ({
+  products: state.products.filter(p => p.id !== productId)
+})),
+
+// ORDERS
+orders: [],
+addOrder: (order) => set((state) => ({
+  orders: [order, ...state.orders]
+})),
+
+updateOrderStatus: (orderId, status) => set((state) => ({
+  orders: state.orders.map(o =>
+    o.id === orderId
+      ? { ...o, status, updatedAt: new Date().toISOString() }
+      : o
+  )
+})),
+
       // PRODUCTS
       products: [
         {
