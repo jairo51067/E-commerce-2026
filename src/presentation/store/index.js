@@ -1,31 +1,40 @@
-// src/presentation/store/index.js - VERSIÓN DEBUG
+// src/presentation/store/index.js - REEMPLAZAR COMPLETO
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export const useStore = create(
   persist(
     (set, get) => ({
+      // AUTH
       user: null,
       login: (userData) => set({ user: userData }),
       logout: () => set({ user: null }),
 
+      // CART
       cart: [],
-      addToCart: (product, quantity) => set((state) => {
+      addToCart: (product, quantity = 1) => set((state) => {
         const existing = state.cart.find(item => item.id === product.id);
-        let newCart;
         
         if (existing) {
-          newCart = state.cart.map(item =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + quantity }
-              : item
-          );
-        } else {
-          newCart = [...state.cart, { ...product, quantity }];
+          return {
+            cart: state.cart.map(item =>
+              item.id === product.id
+                ? { ...item, quantity: Math.max(0, item.quantity + quantity) }
+                : item
+            ).filter(item => item.quantity > 0)
+          };
         }
         
-        console.log('🛒 CART UPDATE:', newCart); // DEBUG
-        return { cart: newCart };
+        return {
+          cart: [...state.cart, {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            stock: product.stock,
+            quantity: Math.max(1, quantity)
+          }]
+        };
       }),
 
       removeFromCart: (productId) => set((state) => ({
@@ -34,50 +43,56 @@ export const useStore = create(
 
       updateQuantity: (productId, quantity) => set((state) => ({
         cart: state.cart.map(item =>
-          item.id === productId ? { ...item, quantity } : item
+          item.id === productId
+            ? { ...item, quantity: Math.max(0, quantity) }
+            : item
         ).filter(item => item.quantity > 0)
       })),
 
       clearCart: () => set({ cart: [] }),
 
-      // GETTERS - SIN PERSISTIR
-      cartTotal: () => {
-        const total = get().cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        console.log('💰 TOTAL CALC:', total); // DEBUG
-        return total;
-      },
-
-      cartQuantity: () => {
-        return get().cart.reduce((sum, item) => sum + item.quantity, 0);
-      },
-
-      products: [  // Mock data
+      // PRODUCTS
+      products: [
         {
           id: '1',
           name: 'iPhone 15 Pro',
           price: 999,
-          image: 'https://via.placeholder.com/300x300/007AFF/FFFFFF?text=iPhone',
-          stock: 10
+          image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400',
+          stock: 10,
+          category: 'electronics'
         },
         {
           id: '2',
-          name: 'MacBook Pro',
+          name: 'MacBook Pro M3',
           price: 1999,
-          image: 'https://via.placeholder.com/300x300/000000/FFFFFF?text=MacBook',
-          stock: 5
+          image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400',
+          stock: 5,
+          category: 'electronics'
         },
         {
           id: '3',
           name: 'AirPods Pro',
           price: 249,
-          image: 'https://via.placeholder.com/300x300/FFFFFF/000000?text=AirPods',
-          stock: 20
+          image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400',
+          stock: 20,
+          category: 'accessories'
+        },
+        {
+          id: '4',
+          name: 'iPad Pro',
+          price: 799,
+          image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400',
+          stock: 8,
+          category: 'electronics'
         }
       ]
     }),
     {
-      name: 'ecommerce-cart',
-      partialize: (state) => ({ user: state.user, cart: state.cart })
+      name: 'ecommerce-blackbox-v2',
+      partialize: (state) => ({
+        user: state.user,
+        cart: state.cart
+      })
     }
   )
 );

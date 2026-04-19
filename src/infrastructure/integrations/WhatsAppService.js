@@ -23,7 +23,7 @@ ${itemsText}
 ⏰ *${new Date().toLocaleString('es-CO')}*
     `.trim();
 
-    const phoneUrl = `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    const phoneUrl = `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`; 
     
     window.open(phoneUrl, '_blank');
     return phoneUrl;

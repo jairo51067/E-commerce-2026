@@ -1,18 +1,30 @@
-// src/presentation/hooks/useCart.js - SIMPLE
+// src/presentation/hooks/useCart.js - REEMPLAZAR COMPLETO
 import { useStore } from '../store/index.js';
 
 export const useCart = () => {
-  const store = useStore();
+  const cart = useStore((state) => state.cart);
+  const addToCart = useStore((state) => state.addToCart);
+  const removeFromCart = useStore((state) => state.removeFromCart);
+  const updateQuantity = useStore((state) => state.updateQuantity);
+  const clearCart = useStore((state) => state.clearCart);
+
+  // CALCULAR AQUÍ DIRECTAMENTE
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + (item.price * item.quantity), 0
+  );
+  
+  const cartQuantity = cart.reduce(
+    (sum, item) => sum + item.quantity, 0
+  );
 
   return {
-    cart: store.cart,
-    cartTotal: store.cartTotal(),  // ← CALL FUNCTION
-    cartQuantity: store.cartQuantity(), // ← CALL FUNCTION
-    products: store.products,
-    addItem: store.addToCart,
-    removeItem: store.removeFromCart,
-    updateItemQuantity: store.updateQuantity,
-    clearCart: store.clearCart,
-    isEmpty: store.cart.length === 0
+    cart,
+    cartTotal,
+    cartQuantity,
+    addItem: addToCart,
+    removeItem: removeFromCart,
+    updateItemQuantity: updateQuantity,
+    clearCart,
+    isEmpty: cart.length === 0
   };
 };
