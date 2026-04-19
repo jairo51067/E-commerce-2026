@@ -1,62 +1,75 @@
-// src/presentation/components/features/Checkout.jsx
+// src/presentation/components/features/Checkout.jsx - COMPLETO FINAL
 import React, { useState } from 'react';
 import { useCart } from '@presentation/hooks/useCart.js';
-import { WhatsAppService } from '@infrastructure/integrations/WhatsAppService.js';
 import { useStore } from '@presentation/store/index.js';
+import { WhatsAppService } from '@infrastructure/integrations/WhatsAppService.js';
 
-
-const DELIVERY_COST = 5.00; // Costo delivery configurable****
+const DELIVERY_COST = 5.00;
 
 export const Checkout = ({ isOpen, onClose }) => {
   const { cart, cartTotal, clearCart } = useCart();
+  const { addOrder } = useStore();
+
   const [customer, setCustomer] = useState({
     name: '',
     phone: '',
     address: '',
-    deliveryType: 'pickup' // pickup | delivery
+    deliveryType: 'pickup'
   });
   const [loading, setLoading] = useState(false);
 
+  // ✅ CRÍTICO: Si no está abierto NO renderiza
   if (!isOpen) return null;
 
   const isDelivery = customer.deliveryType === 'delivery';
   const deliveryCost = isDelivery ? DELIVERY_COST : 0;
   const finalTotal = cartTotal + deliveryCost;
 
-  const { addOrder } = useStore();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    try {
+      // ✅ Crear order
+      const order = {
+        id: `ORD-${Date.now()}`,
+        items: [...cart],
+        customer: { ...customer },
+        subtotal: cartTotal,
+        deliveryCost,
+        total: finalTotal,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
 
-  try {
-    const order = {
-      id: `ORD-${Date.now()}`,
-      items: cart,
-      customer,
-      subtotal: cartTotal,
-      deliveryCost,
-      total: finalTotal,
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    };
+      console.log('📦 ORDER:', order); // Debug
 
-    // ✅ Guardar en store
-    addOrder(order);
+      // ✅ Guardar en store
+      addOrder(order);
 
-    // ✅ WhatsApp
-    WhatsAppService.sendOrder(order, customer.phone);
+      // ✅ WhatsApp
+      WhatsAppService.sendOrder(order, customer.phone);
 
-    clearCart();
-    setCustomer({ name: '', phone: '', address: '', deliveryType: 'pickup' });
-    onClose();
+      // ✅ Limpiar
+      clearCart();
+      setCustomer({
+        name: '',
+        phone: '',
+        address: '',
+        deliveryType: 'pickup'
+      });
 
-  } catch (error) {
-    alert('Error: ' + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      // ✅ Cerrar
+      onClose();
+
+    } catch (error) {
+      console.error('❌ Checkout error:', error);
+      alert('Error: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="checkout-overlay" onClick={onClose}>
       <div className="checkout" onClick={e => e.stopPropagation()}>
@@ -70,10 +83,11 @@ const handleSubmit = async (e) => {
         {/* RESUMEN */}
         <div className="order-summary">
           <h3>📦 Resumen ({cart.length} artículos)</h3>
+
           {cart.map(item => (
             <div key={item.id} className="summary-item">
               <span>{item.name} x{item.quantity}</span>
-              <span>${(item.price * item.quantity).toFixed(2)}</span>
+              <span>${(Number(item.price) * Number(item.quantity)).toFixed(2)}</span>
             </div>
           ))}
 
@@ -127,7 +141,6 @@ const handleSubmit = async (e) => {
 
               <label
                 className={`delivery-option ${customer.deliveryType === 'pickup' ? 'selected' : ''}`}
-                onClick={() => setCustomer({...customer, deliveryType: 'pickup'})}
               >
                 <input
                   type="radio"
@@ -147,7 +160,6 @@ const handleSubmit = async (e) => {
 
               <label
                 className={`delivery-option ${customer.deliveryType === 'delivery' ? 'selected' : ''}`}
-                onClick={() => setCustomer({...customer, deliveryType: 'delivery'})}
               >
                 <input
                   type="radio"
@@ -168,7 +180,7 @@ const handleSubmit = async (e) => {
             </div>
           </div>
 
-          {/* DIRECCIÓN (solo delivery) */}
+          {/* DIRECCIÓN solo si delivery */}
           {isDelivery && (
             <div className="form-section">
               <h4>📍 Dirección de Entrega</h4>
@@ -177,7 +189,7 @@ const handleSubmit = async (e) => {
                 value={customer.address}
                 onChange={e => setCustomer({...customer, address: e.target.value})}
                 rows="3"
-                required={isDelivery}
+                required
               />
             </div>
           )}
@@ -192,7 +204,7 @@ const handleSubmit = async (e) => {
               <span>💳 Zelle</span>
             </div>
             <p className="payment-note">
-              ⚠️ Al confirmar, adjunta tu comprobante de pago en el chat de WhatsApp
+              ⚠️ Adjunta tu comprobante de pago en el chat de WhatsApp
             </p>
           </div>
 
