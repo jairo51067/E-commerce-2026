@@ -5,31 +5,30 @@ import { persist } from 'zustand/middleware';
 export const useStore = create(
   persist(
     (set, get) => ({
-      // AUTH
+      // ✅ AUTH
       user: null,
       login: (userData) => set({ user: userData }),
       logout: () => set({ user: null }),
 
-      // CART
+      // ✅ CART
       cart: [],
       addToCart: (product, quantity = 1) => set((state) => {
         const existing = state.cart.find(item => item.id === product.id);
-        
+
         if (existing) {
-          return {
-            cart: state.cart.map(item =>
-              item.id === product.id
-                ? { ...item, quantity: Math.max(0, item.quantity + quantity) }
-                : item
-            ).filter(item => item.quantity > 0)
-          };
+          const updated = state.cart.map(item =>
+            item.id === product.id
+              ? { ...item, quantity: Math.max(0, item.quantity + quantity) }
+              : item
+          ).filter(item => item.quantity > 0);
+          return { cart: updated };
         }
-        
+
         return {
           cart: [...state.cart, {
             id: product.id,
             name: product.name,
-            price: product.price,
+            price: Number(product.price),
             image: product.image,
             stock: product.stock,
             quantity: Math.max(1, quantity)
@@ -51,36 +50,7 @@ export const useStore = create(
 
       clearCart: () => set({ cart: [] }),
 
-      // PRODUCTS CRUD
-addProduct: (product) => set((state) => ({
-  products: [...state.products, product]
-})),
-
-editProduct: (updatedProduct) => set((state) => ({
-  products: state.products.map(p =>
-    p.id === updatedProduct.id ? updatedProduct : p
-  )
-})),
-
-deleteProduct: (productId) => set((state) => ({
-  products: state.products.filter(p => p.id !== productId)
-})),
-
-// ORDERS
-orders: [],
-addOrder: (order) => set((state) => ({
-  orders: [order, ...state.orders]
-})),
-
-updateOrderStatus: (orderId, status) => set((state) => ({
-  orders: state.orders.map(o =>
-    o.id === orderId
-      ? { ...o, status, updatedAt: new Date().toISOString() }
-      : o
-  )
-})),
-
-      // PRODUCTS
+      // ✅ PRODUCTS CRUD
       products: [
         {
           id: '1',
@@ -114,13 +84,43 @@ updateOrderStatus: (orderId, status) => set((state) => ({
           stock: 8,
           category: 'electronics'
         }
-      ]
+      ],
+
+      addProduct: (product) => set((state) => ({
+        products: [...state.products, product]
+      })),
+
+      editProduct: (updatedProduct) => set((state) => ({
+        products: state.products.map(p =>
+          p.id === updatedProduct.id ? updatedProduct : p
+        )
+      })),
+
+      deleteProduct: (productId) => set((state) => ({
+        products: state.products.filter(p => p.id !== productId)
+      })),
+
+      // ✅ ORDERS
+      orders: [],
+      addOrder: (order) => set((state) => ({
+        orders: [order, ...state.orders]
+      })),
+
+      updateOrderStatus: (orderId, status) => set((state) => ({
+        orders: state.orders.map(o =>
+          o.id === orderId
+            ? { ...o, status, updatedAt: new Date().toISOString() }
+            : o
+        )
+      }))
     }),
     {
-      name: 'ecommerce-blackbox-v2',
+      name: 'ecommerce-blackbox-v3',
       partialize: (state) => ({
         user: state.user,
-        cart: state.cart
+        cart: state.cart,
+        orders: state.orders,
+        products: state.products
       })
     }
   )

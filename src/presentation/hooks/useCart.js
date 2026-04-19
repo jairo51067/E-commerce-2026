@@ -2,19 +2,20 @@
 import { useStore } from '../store/index.js';
 
 export const useCart = () => {
+  // ✅ Selector individual para reactividad
   const cart = useStore((state) => state.cart);
   const addToCart = useStore((state) => state.addToCart);
   const removeFromCart = useStore((state) => state.removeFromCart);
   const updateQuantity = useStore((state) => state.updateQuantity);
   const clearCart = useStore((state) => state.clearCart);
 
-  // CALCULAR AQUÍ DIRECTAMENTE
+  // ✅ Calcular AQUÍ directamente
   const cartTotal = cart.reduce(
-    (sum, item) => sum + (item.price * item.quantity), 0
+    (sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0
   );
-  
+
   const cartQuantity = cart.reduce(
-    (sum, item) => sum + item.quantity, 0
+    (sum, item) => sum + Number(item.quantity), 0
   );
 
   return {

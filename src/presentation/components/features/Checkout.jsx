@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { useCart } from '@presentation/hooks/useCart.js';
 import { WhatsAppService } from '@infrastructure/integrations/WhatsAppService.js';
+import { useStore } from '@presentation/store/index.js';
 
-const DELIVERY_COST = 5.00; // Costo delivery configurable
+
+const DELIVERY_COST = 5.00; // Costo delivery configurable****
 
 export const Checkout = ({ isOpen, onClose }) => {
   const { cart, cartTotal, clearCart } = useCart();
@@ -21,35 +23,40 @@ export const Checkout = ({ isOpen, onClose }) => {
   const deliveryCost = isDelivery ? DELIVERY_COST : 0;
   const finalTotal = cartTotal + deliveryCost;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const { addOrder } = useStore();
 
-    try {
-      const order = {
-        id: `ORD-${Date.now()}`,
-        items: cart,
-        customer,
-        subtotal: cartTotal,
-        deliveryCost,
-        total: finalTotal,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-      WhatsAppService.sendOrder(order, customer.phone);
-      clearCart();
-      setCustomer({ name: '', phone: '', address: '', deliveryType: 'pickup' });
-      onClose();
+  try {
+    const order = {
+      id: `ORD-${Date.now()}`,
+      items: cart,
+      customer,
+      subtotal: cartTotal,
+      deliveryCost,
+      total: finalTotal,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
 
-    } catch (error) {
-      console.error('Checkout error:', error);
-      alert('Error: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ Guardar en store
+    addOrder(order);
 
+    // ✅ WhatsApp
+    WhatsAppService.sendOrder(order, customer.phone);
+
+    clearCart();
+    setCustomer({ name: '', phone: '', address: '', deliveryType: 'pickup' });
+    onClose();
+
+  } catch (error) {
+    alert('Error: ' + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="checkout-overlay" onClick={onClose}>
       <div className="checkout" onClick={e => e.stopPropagation()}>
