@@ -1,11 +1,30 @@
-// src/presentation/components/ui/MiniCart.jsx - REEMPLAZAR COMPLETO
+// src/presentation/components/ui/MiniCart.jsx
 import React from 'react';
 import { useCart } from '@presentation/hooks/useCart.js';
+import { Notifier } from '@infrastructure/utils/notifier.js';
 
 export const MiniCart = ({ isOpen, onClose, onCheckout }) => {
-  const { cart, cartTotal, removeItem, updateItemQuantity } = useCart();
+  const {
+    cart,
+    cartTotal,
+    removeItem,
+    updateItemQuantity
+  } = useCart();
 
   if (!isOpen) return null;
+
+  const handleRemove = (item) => {
+    removeItem(item.id);
+    Notifier.warning(`🗑️ ${item.name} eliminado`);
+  };
+
+  const handleQuantityChange = (item, newQty) => {
+    if (newQty <= 0) {
+      removeItem(item.id);
+    } else if (newQty <= item.stock) {
+      updateItemQuantity(item.id, newQty);
+    }
+  };
 
   return (
     <div className="mini-cart-overlay" onClick={onClose}>
@@ -22,40 +41,44 @@ export const MiniCart = ({ isOpen, onClose, onCheckout }) => {
           {cart.length === 0 ? (
             <div className="empty-cart">
               <p>🛒 Tu carrito está vacío</p>
+              <span>Agrega productos para comenzar</span>
             </div>
           ) : (
             cart.map(item => (
               <div key={item.id} className="cart-item">
-                <img src={item.image} alt={item.name} />
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  onError={e => {
+                    e.target.src = 'https://via.placeholder.com/55';
+                  }}
+                />
                 <div className="item-info">
                   <h4>{item.name}</h4>
-
-                  {/* +/- Controls */}
                   <div className="item-controls">
                     <button
                       className="qty-btn small"
-                      onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                      onClick={() => handleQuantityChange(item, item.quantity - 1)}
                     >
-                      -
+                      −
                     </button>
                     <span>{item.quantity}</span>
                     <button
                       className="qty-btn small"
-                      onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                      onClick={() => handleQuantityChange(item, item.quantity + 1)}
+                      disabled={item.quantity >= item.stock}
                     >
                       +
                     </button>
                   </div>
-
                   <p className="item-price">
-                    ${Number(item.price).toFixed(2)} x {item.quantity} =
-                    <strong> ${(Number(item.price) * Number(item.quantity)).toFixed(2)}</strong>
+                    ${Number(item.price).toFixed(2)} × {item.quantity} =
+                    <strong> ${(Number(item.price) * item.quantity).toFixed(2)}</strong>
                   </p>
                 </div>
-
                 <button
-                  onClick={() => removeItem(item.id)}
                   className="remove-btn"
+                  onClick={() => handleRemove(item)}
                 >
                   🗑️
                 </button>

@@ -5,24 +5,35 @@ import { persist } from 'zustand/middleware';
 export const useStore = create(
   persist(
     (set, get) => ({
-      // ✅ AUTH
+
+      // ===== AUTH =====
       user: null,
       login: (userData) => set({ user: userData }),
       logout: () => set({ user: null }),
 
-      // ✅ CART
+      // ===== CART =====
       cart: [],
+
       addToCart: (product, quantity = 1) => set((state) => {
         const existing = state.cart.find(item => item.id === product.id);
 
         if (existing) {
-          const updated = state.cart.map(item =>
-            item.id === product.id
-              ? { ...item, quantity: Math.max(0, item.quantity + quantity) }
-              : item
-          ).filter(item => item.quantity > 0);
-          return { cart: updated };
+          const newQty = existing.quantity + quantity;
+          if (newQty <= 0) {
+            return {
+              cart: state.cart.filter(item => item.id !== product.id)
+            };
+          }
+          return {
+            cart: state.cart.map(item =>
+              item.id === product.id
+                ? { ...item, quantity: newQty }
+                : item
+            )
+          };
         }
+
+        if (quantity <= 0) return state;
 
         return {
           cart: [...state.cart, {
@@ -30,8 +41,8 @@ export const useStore = create(
             name: product.name,
             price: Number(product.price),
             image: product.image,
-            stock: product.stock,
-            quantity: Math.max(1, quantity)
+            stock: Number(product.stock),
+            quantity: Number(quantity)
           }]
         };
       }),
@@ -40,17 +51,24 @@ export const useStore = create(
         cart: state.cart.filter(item => item.id !== productId)
       })),
 
-      updateQuantity: (productId, quantity) => set((state) => ({
-        cart: state.cart.map(item =>
-          item.id === productId
-            ? { ...item, quantity: Math.max(0, quantity) }
-            : item
-        ).filter(item => item.quantity > 0)
-      })),
+      updateQuantity: (productId, quantity) => set((state) => {
+        if (quantity <= 0) {
+          return {
+            cart: state.cart.filter(item => item.id !== productId)
+          };
+        }
+        return {
+          cart: state.cart.map(item =>
+            item.id === productId
+              ? { ...item, quantity: Number(quantity) }
+              : item
+          )
+        };
+      }),
 
       clearCart: () => set({ cart: [] }),
 
-      // ✅ PRODUCTS CRUD
+      // ===== PRODUCTS =====
       products: [
         {
           id: '1',
@@ -100,8 +118,9 @@ export const useStore = create(
         products: state.products.filter(p => p.id !== productId)
       })),
 
-      // ✅ ORDERS
+      // ===== ORDERS =====
       orders: [],
+
       addOrder: (order) => set((state) => ({
         orders: [order, ...state.orders]
       })),
@@ -115,7 +134,7 @@ export const useStore = create(
       }))
     }),
     {
-      name: 'ecommerce-blackbox-v3',
+      name: 'ecommerce-store-v4',
       partialize: (state) => ({
         user: state.user,
         cart: state.cart,
