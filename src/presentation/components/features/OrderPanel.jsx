@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '@presentation/hooks/useAuth.js';
 import { useStore } from '@presentation/store/index.js';
+import { Notifier } from '@infrastructure/utils/notifier.js';
+import { Exporter } from '@infrastructure/utils/exporter.js';
+
 
 export const OrderPanel = ({ isOpen, onClose }) => {
   const { user } = useAuth();
@@ -16,10 +19,10 @@ export const OrderPanel = ({ isOpen, onClose }) => {
     : orders.filter(o => o.status === filter);
 
   const STATUS = {
-    pending:   { label: '⏳ Pendiente',  color: '#FF9500' },
-    paid:      { label: '✅ Pagado',      color: '#007AFF' },
-    shipped:   { label: '🚚 Despachado', color: '#34C759' },
-    cancelled: { label: '❌ Cancelado',  color: '#FF3B30' }
+    pending: { label: '⏳ Pendiente', color: '#FF9500' },
+    paid: { label: '✅ Pagado', color: '#007AFF' },
+    shipped: { label: '🚚 Despachado', color: '#34C759' },
+    cancelled: { label: '❌ Cancelado', color: '#FF3B30' }
   };
 
   const totalRevenue = orders
@@ -41,32 +44,49 @@ export const OrderPanel = ({ isOpen, onClose }) => {
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
+        <div className="panel-header-actions">
+          <button
+            className="export-btn"
+            onClick={() => {
+              try {
+                Exporter.ordersToCSV(orders);
+                Notifier.success('📊 Pedidos exportados a CSV!');
+              } catch (error) {
+                Notifier.error(error.message);
+              }
+            }}
+          >
+            📊 Exportar CSV
+          </button>
+          <button className="close-btn" onClick={onClose}>✕</button>
+        </div>
+
         {/* STATS */}
         <div className="order-stats">
           <div className="stat-box">
             <strong>{orders.length}</strong>
             <span>Total Pedidos</span>
           </div>
-          <div className="stat-box" style={{background: '#FFF3E0'}}>
-            <strong style={{color: '#FF9500'}}>
+          <div className="stat-box" style={{ background: '#FFF3E0' }}>
+            <strong style={{ color: '#FF9500' }}>
               {orders.filter(o => o.status === 'pending').length}
             </strong>
             <span>Pendientes</span>
           </div>
-          <div className="stat-box" style={{background: '#E3F2FD'}}>
-            <strong style={{color: '#007AFF'}}>
+          <div className="stat-box" style={{ background: '#E3F2FD' }}>
+            <strong style={{ color: '#007AFF' }}>
               {orders.filter(o => o.status === 'paid').length}
             </strong>
             <span>Pagados</span>
           </div>
-          <div className="stat-box" style={{background: '#E8F5E9'}}>
-            <strong style={{color: '#34C759'}}>
+          <div className="stat-box" style={{ background: '#E8F5E9' }}>
+            <strong style={{ color: '#34C759' }}>
               {orders.filter(o => o.status === 'shipped').length}
             </strong>
             <span>Despachados</span>
           </div>
-          <div className="stat-box" style={{background: '#F3E5F5'}}>
-            <strong style={{color: '#764ba2'}}>
+          <div className="stat-box" style={{ background: '#F3E5F5' }}>
+            <strong style={{ color: '#764ba2' }}>
               ${totalRevenue.toFixed(2)}
             </strong>
             <span>Ingresos</span>
@@ -157,7 +177,7 @@ export const OrderPanel = ({ isOpen, onClose }) => {
                     )}
                     <div className="order-total-row total">
                       <strong>TOTAL:</strong>
-                      <strong style={{color: '#34C759'}}>
+                      <strong style={{ color: '#34C759' }}>
                         ${Number(order.total).toFixed(2)}
                       </strong>
                     </div>
@@ -172,24 +192,28 @@ export const OrderPanel = ({ isOpen, onClose }) => {
                     <>
                       <button
                         className="btn-paid"
-                        onClick={() => updateOrderStatus(order.id, 'paid')}
+                        onClick={() => {
+                          updateOrderStatus(order.id, 'paid');
+                          Notifier.success('✅ Pedido marcado como pagado');
+                        }}
                       >
                         ✅ Marcar Pagado
                       </button>
                       {(user?.role === 'GERENTE' ||
                         user?.role === 'ADMIN' ||
                         user?.role === 'SUPERUSER') && (
-                        <button
-                          className="btn-cancel-order"
-                          onClick={() => {
-                            if (window.confirm('¿Cancelar este pedido?')) {
-                              updateOrderStatus(order.id, 'cancelled');
-                            }
-                          }}
-                        >
-                          ❌ Cancelar
-                        </button>
-                      )}
+                          <button
+                            className="btn-cancel-order"
+                            onClick={() => {
+                              if (window.confirm('¿Cancelar pedido?')) {
+                                updateOrderStatus(order.id, 'cancelled');
+                                Notifier.warning('❌ Pedido cancelado');
+                              }
+                            }}
+                          >
+                            ❌ Cancelar
+                          </button>
+                        )}
                     </>
                   )}
 
@@ -200,6 +224,7 @@ export const OrderPanel = ({ isOpen, onClose }) => {
                       onClick={() => {
                         if (window.confirm('¿Confirmar despacho?')) {
                           updateOrderStatus(order.id, 'shipped');
+                          Notifier.success('🚚 Pedido despachado!');
                         }
                       }}
                     >

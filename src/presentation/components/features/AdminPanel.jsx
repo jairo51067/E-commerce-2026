@@ -1,7 +1,9 @@
-// src/presentation/components/features/AdminPanel.jsx - REEMPLAZAR
 import React, { useState } from 'react';
 import { useStore } from '@presentation/store/index.js';
 import { useAuth } from '@presentation/hooks/useAuth.js';
+// 1. INTEGRACIÓN DE IMPORTS
+import { Notifier } from '@infrastructure/utils/notifier.js';
+import { Exporter } from '@infrastructure/utils/exporter.js';
 
 const EMPTY_PRODUCT = {
   name: '',
@@ -39,15 +41,18 @@ export const AdminPanel = ({ isOpen, onClose }) => {
     setView('edit');
   };
 
+  // 2. INTEGRACIÓN DE handleDelete (Con Notifier)
   const handleDelete = (productId) => {
     if (window.confirm('¿Eliminar este producto?')) {
       deleteProduct(productId);
+      Notifier.error('🗑️ Producto eliminado');
     }
   };
 
+  // 3. INTEGRACIÓN DE handleSave (Con validaciones de Notifier)
   const handleSave = () => {
     if (!form.name || !form.price || !form.stock) {
-      alert('⚠️ Completa nombre, precio y stock');
+      Notifier.warning('⚠️ Completa nombre, precio y stock');
       return;
     }
 
@@ -55,15 +60,15 @@ export const AdminPanel = ({ isOpen, onClose }) => {
       ...form,
       price: parseFloat(form.price),
       stock: parseInt(form.stock),
-      id: view === 'edit'
-        ? selectedProduct.id
-        : `prod_${Date.now()}`
+      id: view === 'edit' ? selectedProduct.id : `prod_${Date.now()}`
     };
 
     if (view === 'edit') {
       editProduct(productData);
+      Notifier.success('✅ Producto actualizado!');
     } else {
       addProduct(productData);
+      Notifier.success('✅ Producto agregado!');
     }
 
     setView('list');
@@ -107,19 +112,36 @@ export const AdminPanel = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* TABS */}
-        <div className="panel-tabs">
+        {/* TABS Y BOTÓN EXPORTAR */}
+        <div className="panel-tabs" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <button
+              className={`tab ${view === 'list' ? 'active' : ''}`}
+              onClick={() => setView('list')}
+            >
+              📦 Productos
+            </button>
+            <button
+              className={`tab ${view === 'add' ? 'active' : ''}`}
+              onClick={() => { setForm(EMPTY_PRODUCT); setView('add'); }}
+            >
+              ➕ Nuevo Producto
+            </button>
+          </div>
+
+          {/* 4. INTEGRACIÓN DEL BOTÓN EXPORT */}
           <button
-            className={`tab ${view === 'list' ? 'active' : ''}`}
-            onClick={() => setView('list')}
+            className="export-btn"
+            onClick={() => {
+              try {
+                Exporter.productsToCSV(products);
+                Notifier.success('📊 Productos exportados a CSV!');
+              } catch (error) {
+                Notifier.error(error.message);
+              }
+            }}
           >
-            📦 Productos
-          </button>
-          <button
-            className={`tab ${view === 'add' ? 'active' : ''}`}
-            onClick={() => { setForm(EMPTY_PRODUCT); setView('add'); }}
-          >
-            ➕ Nuevo Producto
+            📊 Exportar CSV
           </button>
         </div>
 

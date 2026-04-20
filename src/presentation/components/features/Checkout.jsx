@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useCart } from '@presentation/hooks/useCart.js';
 import { useStore } from '@presentation/store/index.js';
 import { WhatsAppService } from '@infrastructure/integrations/WhatsAppService.js';
+import { Notifier } from '@infrastructure/utils/notifier.js';
 
 const DELIVERY_COST = 5.00;
 
@@ -26,49 +27,37 @@ export const Checkout = ({ isOpen, onClose }) => {
   const finalTotal = cartTotal + deliveryCost;
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      // ✅ Crear order
-      const order = {
-        id: `ORD-${Date.now()}`,
-        items: [...cart],
-        customer: { ...customer },
-        subtotal: cartTotal,
-        deliveryCost,
-        total: finalTotal,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
+  try {
+    const order = {
+      id: `ORD-${Date.now()}`,
+      items: [...cart],
+      customer: { ...customer },
+      subtotal: cartTotal,
+      deliveryCost,
+      total: finalTotal,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
 
-      console.log('📦 ORDER:', order); // Debug
+    addOrder(order);
+    WhatsAppService.sendOrder(order, customer.phone);
 
-      // ✅ Guardar en store
-      addOrder(order);
+    Notifier.whatsapp('📱 Pedido enviado por WhatsApp!', 4000);
+    Notifier.order(`📦 Pedido #${order.id} creado`, 4000);
 
-      // ✅ WhatsApp
-      WhatsAppService.sendOrder(order, customer.phone);
+    clearCart();
+    setCustomer({ name: '', phone: '', address: '', deliveryType: 'pickup' });
+    onClose();
 
-      // ✅ Limpiar
-      clearCart();
-      setCustomer({
-        name: '',
-        phone: '',
-        address: '',
-        deliveryType: 'pickup'
-      });
-
-      // ✅ Cerrar
-      onClose();
-
-    } catch (error) {
-      console.error('❌ Checkout error:', error);
-      alert('Error: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    Notifier.error('❌ Error: ' + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="checkout-overlay" onClick={onClose}>
