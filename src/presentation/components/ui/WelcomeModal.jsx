@@ -64,8 +64,12 @@ export const WelcomeModal = ({ onClose }) => {
 
           {/* REDES */}
           <div className="welcome-social">
-            <span>📸 {STORE_CONFIG.social.instagram}</span>
-            <span>👥 {STORE_CONFIG.social.facebook}</span>
+            <span>🌐 {STORE_CONFIG.social.instagram}</span>
+            <span>🌐 {STORE_CONFIG.social.facebook}</span>
+            
+            <a href={`https://twitter.com/${STORE_CONFIG.social.twitter}`} target="_blank" rel="noopener noreferrer">
+              <span>🌐 {STORE_CONFIG.social.twitter}</span>
+            </a>
           </div>
 
           {/* BOTÓN */}
