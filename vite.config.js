@@ -11,6 +11,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@app': path.resolve(__dirname, './src/app'),
       '@config': path.resolve(__dirname, './src/config'),
+      '@application': path.resolve(__dirname, './src/application'),  // ✅ NUEVO
       '@presentation': path.resolve(__dirname, './src/presentation'),
       '@infrastructure': path.resolve(__dirname, './src/infrastructure'),
       '@domain': path.resolve(__dirname, './src/domain'),
@@ -19,7 +20,6 @@ export default defineConfig({
   },
 
   build: {
-    // ✅ Optimizar chunks
     rollupOptions: {
       output: {
         manualChunks: {
@@ -28,16 +28,8 @@ export default defineConfig({
         }
       }
     },
-    // ✅ Comprimir
     minify: 'terser',
     sourcemap: false,
     chunkSizeWarningLimit: 600
-  },
-
-  server: {
-    // ✅ Sin overlay de errores en producción
-    hmr: {
-      overlay: true
-    }
   }
 });
