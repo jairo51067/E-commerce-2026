@@ -9,11 +9,12 @@ export const ProductCard = ({ product }) => {
   const cartItem = cart.find(item => item.id === product.id);
   const currentQty = cartItem ? cartItem.quantity : 0;
 
+  // ✅ Calcular descuento
   const hasDiscount = product.originalPrice &&
     Number(product.originalPrice) > Number(product.price);
 
   const discountPct = hasDiscount
-    ? Math.round((1 - product.price / product.originalPrice) * 100)
+    ? Math.round((1 - Number(product.price) / Number(product.originalPrice)) * 100)
     : 0;
 
   const handleAdd = () => {
@@ -39,19 +40,19 @@ export const ProductCard = ({ product }) => {
   return (
     <div className="product-card">
 
-      {/* BADGES */}
+      {/* ✅ BADGES */}
       <div className="product-badges">
         {product.isNew && (
-          <span className="badge badge-new">NUEVO</span>
+          <span className="badge badge-new">✨ NUEVO</span>
         )}
-        {hasDiscount && (
+        {hasDiscount && discountPct > 0 && (
           <span className="badge badge-discount">-{discountPct}%</span>
         )}
         {product.stock === 0 && (
           <span className="badge badge-out">AGOTADO</span>
         )}
         {product.stock <= 3 && product.stock > 0 && (
-          <span className="badge badge-low">ÚLTIMAS</span>
+          <span className="badge badge-low">🔥 ÚLTIMAS</span>
         )}
       </div>
 
@@ -68,7 +69,7 @@ export const ProductCard = ({ product }) => {
       <div className="product-info">
         <h3>{product.name}</h3>
 
-        {/* PRECIOS */}
+        {/* ✅ PRECIOS */}
         <div className="product-prices">
           {hasDiscount && (
             <span className="price-original">
@@ -78,6 +79,11 @@ export const ProductCard = ({ product }) => {
           <span className="price">
             ${Number(product.price).toFixed(2)}
           </span>
+          {hasDiscount && discountPct > 0 && (
+            <span className="discount-tag">
+              Ahorras ${(Number(product.originalPrice) - Number(product.price)).toFixed(2)}
+            </span>
+          )}
         </div>
 
         {/* STOCK */}
@@ -104,10 +110,7 @@ export const ProductCard = ({ product }) => {
         ) : (
           <>
             <div className="quantity-control">
-              <button
-                className="qty-btn"
-                onClick={handleDecrease}
-              >
+              <button className="qty-btn" onClick={handleDecrease}>
                 −
               </button>
               <span className="qty-display">{currentQty}</span>
@@ -120,7 +123,7 @@ export const ProductCard = ({ product }) => {
               </button>
             </div>
             <p className="subtotal">
-              ${(Number(product.price) * currentQty).toFixed(2)}
+              Subtotal: ${(Number(product.price) * currentQty).toFixed(2)}
             </p>
           </>
         )}

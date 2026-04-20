@@ -1,10 +1,92 @@
 // src/presentation/store/index.js - REEMPLAZAR COMPLETO
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+const INITIAL_PRODUCTS = [
+  {
+    id: '1',
+    name: 'iPhone 15 Pro',
+    price: 899,
+    originalPrice: 999,
+    discount: 10,
+    isNew: false,
+    isOffer: true,
+    badge: 'OFERTA',
+    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400',
+    stock: 10,
+    category: 'electronics'
+  },
+  {
+    id: '2',
+    name: 'MacBook Pro M3',
+    price: 1799,
+    originalPrice: 1999,
+    discount: 10,
+    isNew: true,
+    isOffer: true,
+    badge: 'NUEVO',
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400',
+    stock: 5,
+    category: 'electronics'
+  },
+  {
+    id: '3',
+    name: 'AirPods Pro',
+    price: 199,
+    originalPrice: 249,
+    discount: 20,
+    isNew: false,
+    isOffer: true,
+    badge: 'OFERTA',
+    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400',
+    stock: 3,
+    category: 'accessories'
+  },
+  {
+    id: '4',
+    name: 'iPad Pro',
+    price: 799,
+    originalPrice: null,
+    discount: 0,
+    isNew: true,
+    isOffer: false,
+    badge: 'NUEVO',
+    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400',
+    stock: 8,
+    category: 'electronics'
+  },
+  {
+    id: '5',
+    name: 'Apple Watch Ultra',
+    price: 699,
+    originalPrice: 799,
+    discount: 12,
+    isNew: false,
+    isOffer: true,
+    badge: 'OFERTA',
+    image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400',
+    stock: 0,
+    category: 'accessories'
+  },
+  {
+    id: '6',
+    name: 'Samsung 4K TV 55"',
+    price: 599,
+    originalPrice: null,
+    discount: 0,
+    isNew: true,
+    isOffer: false,
+    badge: 'NUEVO',
+    image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f4834c?w=400',
+    stock: 4,
+    category: 'electronics'
+  }
+];
 
 export const useStore = create(
   persist(
     (set, get) => ({
+
       // ===== AUTH =====
       user: null,
       login: (userData) => set({ user: userData }),
@@ -13,166 +95,103 @@ export const useStore = create(
       // ===== CART =====
       cart: [],
 
-      addToCart: (product, quantity = 1) =>
-        set((state) => {
-          const existing = state.cart.find((item) => item.id === product.id);
+      addToCart: (product, quantity = 1) => set((state) => {
+        const existing = state.cart.find(item => item.id === product.id);
 
-          if (existing) {
-            const newQty = existing.quantity + quantity;
-            if (newQty <= 0) {
-              return {
-                cart: state.cart.filter((item) => item.id !== product.id),
-              };
-            }
+        if (existing) {
+          const newQty = existing.quantity + quantity;
+          if (newQty <= 0) {
             return {
-              cart: state.cart.map((item) =>
-                item.id === product.id ? { ...item, quantity: newQty } : item,
-              ),
-            };
-          }
-
-          if (quantity <= 0) return state;
-
-          return {
-            cart: [
-              ...state.cart,
-              {
-                id: product.id,
-                name: product.name,
-                price: Number(product.price),
-                image: product.image,
-                stock: Number(product.stock),
-                quantity: Number(quantity),
-              },
-            ],
-          };
-        }),
-
-      removeFromCart: (productId) =>
-        set((state) => ({
-          cart: state.cart.filter((item) => item.id !== productId),
-        })),
-
-      updateQuantity: (productId, quantity) =>
-        set((state) => {
-          if (quantity <= 0) {
-            return {
-              cart: state.cart.filter((item) => item.id !== productId),
+              cart: state.cart.filter(item => item.id !== product.id)
             };
           }
           return {
-            cart: state.cart.map((item) =>
-              item.id === productId
-                ? { ...item, quantity: Number(quantity) }
-                : item,
-            ),
+            cart: state.cart.map(item =>
+              item.id === product.id
+                ? { ...item, quantity: newQty }
+                : item
+            )
           };
-        }),
+        }
+
+        if (quantity <= 0) return state;
+
+        return {
+          cart: [...state.cart, {
+            id: product.id,
+            name: product.name,
+            price: Number(product.price),
+            image: product.image,
+            stock: Number(product.stock),
+            quantity: Number(quantity)
+          }]
+        };
+      }),
+
+      removeFromCart: (productId) => set((state) => ({
+        cart: state.cart.filter(item => item.id !== productId)
+      })),
+
+      updateQuantity: (productId, quantity) => set((state) => {
+        if (quantity <= 0) {
+          return {
+            cart: state.cart.filter(item => item.id !== productId)
+          };
+        }
+        return {
+          cart: state.cart.map(item =>
+            item.id === productId
+              ? { ...item, quantity: Number(quantity) }
+              : item
+          )
+        };
+      }),
 
       clearCart: () => set({ cart: [] }),
 
       // ===== PRODUCTS =====
-      products: [
-        {
-          id: "1",
-          name: "iPhone 15 Pro",
-          price: 999, // ✅ Precio oferta
-          originalPrice: 999, // ✅ Precio original
-          discount: 10, // ✅ % descuento
-          isNew: false,
-          isOffer: true,
-          badge: "OFERTA",
-          image:
-            "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400",
-          stock: 10,
-          category: "electronics",
-        },
-        {
-          id: "2",
-          name: "MacBook Pro M3",
-          price: 899, // ✅ Precio oferta
-          originalPrice: 999, // ✅ Precio original
-          discount: 10, // ✅ % descuento
-          isNew: false,
-          isOffer: true,
-          badge: "OFERTA",
-          image:
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-          stock: 5,
-          category: "electronics",
-        },
-        {
-          id: "3",
-          name: "AirPods Pro",
-          price: 899, // ✅ Precio oferta
-          originalPrice: 999, // ✅ Precio original
-          discount: 10, // ✅ % descuento
-          isNew: false,
-          isOffer: true,
-          badge: "OFERTA",
-          image:
-            "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400",
-          stock: 20,
-          category: "accessories",
-        },
-        {
-          id: "4",
-          name: "iPad Pro",
-          price: 899, // ✅ Precio oferta
-          originalPrice: 999, // ✅ Precio original
-          discount: 10, // ✅ % descuento
-          isNew: false,
-          isOffer: true,
-          badge: "OFERTA",
-          image:
-            "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400",
-          stock: 8,
-          category: "electronics",
-        },
-      ],
+      products: INITIAL_PRODUCTS,
 
-      addProduct: (product) =>
-        set((state) => ({
-          products: [...state.products, product],
-        })),
+      addProduct: (product) => set((state) => ({
+        products: [...state.products, product]
+      })),
 
-      editProduct: (updatedProduct) =>
-        set((state) => ({
-          products: state.products.map((p) =>
-            p.id === updatedProduct.id ? updatedProduct : p,
-          ),
-        })),
+      editProduct: (updatedProduct) => set((state) => ({
+        products: state.products.map(p =>
+          p.id === updatedProduct.id ? updatedProduct : p
+        )
+      })),
 
-      deleteProduct: (productId) =>
-        set((state) => ({
-          products: state.products.filter((p) => p.id !== productId),
-        })),
+      deleteProduct: (productId) => set((state) => ({
+        products: state.products.filter(p => p.id !== productId)
+      })),
+
+      // ✅ Reset productos a los iniciales
+      resetProducts: () => set({ products: INITIAL_PRODUCTS }),
 
       // ===== ORDERS =====
       orders: [],
 
-      addOrder: (order) =>
-        set((state) => ({
-          orders: [order, ...state.orders],
-        })),
+      addOrder: (order) => set((state) => ({
+        orders: [order, ...state.orders]
+      })),
 
-      updateOrderStatus: (orderId, status) =>
-        set((state) => ({
-          orders: state.orders.map((o) =>
-            o.id === orderId
-              ? { ...o, status, updatedAt: new Date().toISOString() }
-              : o,
-          ),
-        })),
+      updateOrderStatus: (orderId, status) => set((state) => ({
+        orders: state.orders.map(o =>
+          o.id === orderId
+            ? { ...o, status, updatedAt: new Date().toISOString() }
+            : o
+        )
+      }))
     }),
     {
-      name: "ecommerce-store-v4",
+      name: 'ecommerce-store-v5',  // ✅ Nueva versión = limpia cache
       partialize: (state) => ({
         user: state.user,
         cart: state.cart,
         orders: state.orders,
-        products: state.products,
-      }),
-    },
-  ),
+        products: state.products
+      })
+    }
+  )
 );
