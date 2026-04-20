@@ -1,67 +1,85 @@
-// src/presentation/components/ui/MiniCart.jsx - FINAL
+// src/presentation/components/ui/MiniCart.jsx - REEMPLAZAR COMPLETO
 import React from 'react';
 import { useCart } from '@presentation/hooks/useCart.js';
 
 export const MiniCart = ({ isOpen, onClose, onCheckout }) => {
   const { cart, cartTotal, removeItem, updateItemQuantity } = useCart();
 
-  const handleQuantityChange = (itemId, qty) => {
-    updateItemQuantity(itemId, qty);
-  };
-
-  if (!isOpen || cart.length === 0) return null;
+  if (!isOpen) return null;
 
   return (
     <div className="mini-cart-overlay" onClick={onClose}>
       <div className="mini-cart" onClick={e => e.stopPropagation()}>
+
+        {/* HEADER */}
         <div className="mini-cart-header">
-          <h3>🛒 Carrito ({cart.length} artículos)</h3>
+          <h3>🛒 Carrito ({cart.length})</h3>
           <button onClick={onClose}>✕</button>
         </div>
-        
+
+        {/* ITEMS */}
         <div className="cart-items">
-          {cart.map(item => (
-            <div key={item.id} className="cart-item">
-              <img src={item.image} alt={item.name} />
-              <div className="item-info">
-                <h4>{item.name}</h4>
-                <div className="item-controls">
-                  <button 
-                    className="qty-btn small"
-                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                  >-</button>
-                  <span>{item.quantity}</span>
-                  <button 
-                    className="qty-btn small"
-                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                  >+</button>
-                </div>
-                <p className="item-price">
-                  ${item.price.toFixed(2)} x {item.quantity} = ${(item.price * item.quantity).toFixed(2)}
-                </p>
-              </div>
-              <button 
-                onClick={() => removeItem(item.id)}
-                className="remove-btn"
-              >
-                🗑️
-              </button>
+          {cart.length === 0 ? (
+            <div className="empty-cart">
+              <p>🛒 Tu carrito está vacío</p>
             </div>
-          ))}
+          ) : (
+            cart.map(item => (
+              <div key={item.id} className="cart-item">
+                <img src={item.image} alt={item.name} />
+                <div className="item-info">
+                  <h4>{item.name}</h4>
+
+                  {/* +/- Controls */}
+                  <div className="item-controls">
+                    <button
+                      className="qty-btn small"
+                      onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                    >
+                      -
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      className="qty-btn small"
+                      onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <p className="item-price">
+                    ${Number(item.price).toFixed(2)} x {item.quantity} =
+                    <strong> ${(Number(item.price) * Number(item.quantity)).toFixed(2)}</strong>
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => removeItem(item.id)}
+                  className="remove-btn"
+                >
+                  🗑️
+                </button>
+              </div>
+            ))
+          )}
         </div>
-        
-        <div className="cart-footer">
-          <div className="cart-total">
-            <strong>TOTAL: ${cartTotal.toFixed(2)}</strong>
+
+        {/* FOOTER */}
+        {cart.length > 0 && (
+          <div className="cart-footer">
+            <div className="cart-total">
+              <span>TOTAL:</span>
+              <strong>${cartTotal.toFixed(2)}</strong>
+            </div>
+            <button
+              className="checkout-btn"
+              onClick={onCheckout}
+            >
+              💳 Checkout ${cartTotal.toFixed(2)}
+            </button>
           </div>
-          <button 
-            className="checkout-btn"
-            onClick={onCheckout}
-            disabled={cartTotal === 0}
-          >
-            💳 Checkout (${cartTotal.toFixed(0)})
-          </button>
-        </div>
+        )}
+
       </div>
     </div>
   );
