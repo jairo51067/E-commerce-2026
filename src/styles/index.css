@@ -1,4 +1,4 @@
-/* ===== ESTILOS GLOBALES ===== */
+/* ===== IMPORTAR TODO EN ORDEN ===== */
 @import './variables.css';
 @import './reset.css';
 @import './layout.css';
@@ -9,5 +9,7 @@
 @import './panels.css';
 @import './modals.css';
 @import './toast.css';
-@import './welcome.css';    /* ✅ NUEVO */
-@import './responsive.css';
+@import './welcome.css';
+@import './categories.css';   /* ✅ NUEVO */
+@import './bottomnav.css';    /* ✅ NUEVO */
+@import './responsive.css';   /* ← Siempre al final */

@@ -25,4 +25,14 @@ export const STORE_CONFIG = {
 
   schedule: "Lun - Sab: 8am - 6pm",
   location: "Caracas, Venezuela",
+
+  // Nuevas categorías integradas
+  categories: [
+    { id: 'all',         label: 'Todos',         icon: '🏪' },
+    { id: 'electronics', label: 'Electrónicos',  icon: '📱' },
+    { id: 'accessories', label: 'Accesorios',    icon: '🎧' },
+    { id: 'clothing',    label: 'Ropa',          icon: '👕' },
+    { id: 'food',        label: 'Comida',        icon: '🍕' },
+    { id: 'offers',      label: 'Ofertas',       icon: '🔥' }
+  ]
 };

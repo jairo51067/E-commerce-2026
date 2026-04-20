@@ -1,0 +1,74 @@
+/* ===== SEARCH BAR ===== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  margin: 0 1rem 1rem 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  gap: 0.5rem;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  color: #333;
+  background: transparent;
+  font-family: var(--font-family);
+}
+
+.search-bar input::placeholder {
+  color: #aaa;
+}
+
+.search-bar span {
+  font-size: 1.1rem;
+  color: #999;
+}
+
+/* ===== CATEGORIES BAR ===== */
+.categories-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(255,255,255,0.1);
+  scrollbar-width: none;
+}
+
+.categories-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.6rem 1rem;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  min-width: 70px;
+}
+
+.category-btn span:first-child {
+  font-size: 1.4rem;
+}
+
+.category-btn.active,
+.category-btn:hover {
+  background: rgba(255,255,255,0.3);
+  border-color: rgba(255,255,255,0.5);
+  transform: translateY(-2px);
+}
