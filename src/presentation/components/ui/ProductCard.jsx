@@ -1,13 +1,40 @@
-// ProductCard con badges + precio descuento
+// src/presentation/components/ui/ProductCard.jsx
+import React from 'react';
+import { useCart } from '@presentation/hooks/useCart.js';
+import { Notifier } from '@infrastructure/utils/notifier.js';
+
 export const ProductCard = ({ product }) => {
   const { addItem, removeItem, updateItemQuantity, cart } = useCart();
+
   const cartItem = cart.find(item => item.id === product.id);
   const currentQty = cartItem ? cartItem.quantity : 0;
 
-  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
+  const hasDiscount = product.originalPrice &&
+    Number(product.originalPrice) > Number(product.price);
+
   const discountPct = hasDiscount
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
+
+  const handleAdd = () => {
+    addItem(product, 1);
+    Notifier.cart(`🛒 ${product.name} agregado`);
+  };
+
+  const handleIncrease = () => {
+    if (currentQty < product.stock) {
+      updateItemQuantity(product.id, currentQty + 1);
+    }
+  };
+
+  const handleDecrease = () => {
+    if (currentQty === 1) {
+      removeItem(product.id);
+      Notifier.warning(`➖ ${product.name} eliminado`);
+    } else {
+      updateItemQuantity(product.id, currentQty - 1);
+    }
+  };
 
   return (
     <div className="product-card">
@@ -28,6 +55,7 @@ export const ProductCard = ({ product }) => {
         )}
       </div>
 
+      {/* IMAGEN */}
       <img
         src={product.image}
         alt={product.name}
@@ -36,6 +64,7 @@ export const ProductCard = ({ product }) => {
         }}
       />
 
+      {/* INFO */}
       <div className="product-info">
         <h3>{product.name}</h3>
 
@@ -67,30 +96,24 @@ export const ProductCard = ({ product }) => {
         {currentQty === 0 ? (
           <button
             className="add-to-cart-btn"
-            onClick={() => {
-              addItem(product, 1);
-              Notifier.cart(`🛒 ${product.name} agregado`);
-            }}
+            onClick={handleAdd}
             disabled={product.stock === 0}
           >
-            🛒 Agregar
+            🛒 Agregar al carrito
           </button>
         ) : (
           <>
             <div className="quantity-control">
               <button
                 className="qty-btn"
-                onClick={() => {
-                  if (currentQty === 1) removeItem(product.id);
-                  else updateItemQuantity(product.id, currentQty - 1);
-                }}
+                onClick={handleDecrease}
               >
                 −
               </button>
               <span className="qty-display">{currentQty}</span>
               <button
                 className="qty-btn"
-                onClick={() => updateItemQuantity(product.id, currentQty + 1)}
+                onClick={handleIncrease}
                 disabled={currentQty >= product.stock}
               >
                 +
@@ -102,6 +125,7 @@ export const ProductCard = ({ product }) => {
           </>
         )}
       </div>
+
     </div>
   );
 };
