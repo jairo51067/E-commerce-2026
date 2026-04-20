@@ -15,9 +15,12 @@ export const STORE_CONFIG = {
   },
 
   social: {
-    instagram: "@clickandgo_store",
-    facebook: "ClickAndGoStore",
-    twitter: "@clickandgo_st",
+    // instagram: "@clickandgo_store",
+    instagram: "instagram",
+    // facebook: "ClickAndGoStore",
+    facebook: "facebook",
+    // twitter: "@clickandgo_st",
+    twitter: "twitter",
   },
 
   schedule: "Lun - Sab: 8am - 6pm",
