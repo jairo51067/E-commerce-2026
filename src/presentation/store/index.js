@@ -11,8 +11,7 @@ const INITIAL_PRODUCTS = [
     discount: 10,
     isNew: false,
     isOffer: true,
-    badge: 'OFERTA',
-    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400',
+    image: 'https://placehold.co/400x300/667eea/white?text=iPhone+15+Pro',
     stock: 10,
     category: 'electronics'
   },
@@ -24,8 +23,7 @@ const INITIAL_PRODUCTS = [
     discount: 10,
     isNew: true,
     isOffer: true,
-    badge: 'NUEVO',
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400',
+    image: 'https://placehold.co/400x300/764ba2/white?text=MacBook+Pro+M3',
     stock: 5,
     category: 'electronics'
   },
@@ -37,8 +35,7 @@ const INITIAL_PRODUCTS = [
     discount: 20,
     isNew: false,
     isOffer: true,
-    badge: 'OFERTA',
-    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400',
+    image: 'https://placehold.co/400x300/34C759/white?text=AirPods+Pro',
     stock: 3,
     category: 'accessories'
   },
@@ -50,8 +47,7 @@ const INITIAL_PRODUCTS = [
     discount: 0,
     isNew: true,
     isOffer: false,
-    badge: 'NUEVO',
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400',
+    image: 'https://placehold.co/400x300/007AFF/white?text=iPad+Pro',
     stock: 8,
     category: 'electronics'
   },
@@ -63,8 +59,7 @@ const INITIAL_PRODUCTS = [
     discount: 12,
     isNew: false,
     isOffer: true,
-    badge: 'OFERTA',
-    image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400',
+    image: 'https://placehold.co/400x300/FF9500/white?text=Apple+Watch',
     stock: 0,
     category: 'accessories'
   },
@@ -76,8 +71,7 @@ const INITIAL_PRODUCTS = [
     discount: 0,
     isNew: true,
     isOffer: false,
-    badge: 'NUEVO',
-    image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f4834c?w=400',
+    image: 'https://placehold.co/400x300/FF3B30/white?text=Samsung+TV+55',
     stock: 4,
     category: 'electronics'
   }

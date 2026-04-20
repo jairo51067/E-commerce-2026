@@ -57,13 +57,15 @@ export const ProductCard = ({ product }) => {
       </div>
 
       {/* IMAGEN */}
-      <img
-        src={product.image}
-        alt={product.name}
-        onError={e => {
-          e.target.src = 'https://via.placeholder.com/300x200?text=Sin+imagen';
-        }}
-      />
+     <img
+  src={product.image}
+  alt={product.name}
+  loading="lazy"                    // ✅ Lazy loading nativo
+  decoding="async"                  // ✅ Decodificación async
+  onError={e => {
+    e.target.src = 'https://placehold.co/400x300/eee/999?text=Sin+imagen';
+  }}
+/>
 
       {/* INFO */}
       <div className="product-info">

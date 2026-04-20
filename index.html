@@ -1,13 +1,62 @@
+<!-- index.html - REEMPLAZAR COMPLETO -->
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>E-commerce 2026</title>
-</head>
-<body>
-  <div id="root"><!-- React se monta aquí --></div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="E-Commerce 2026 - Tu tienda online" />
+    <meta name="theme-color" content="#667eea" />
+
+    <!-- ✅ Preconnect solo dominios necesarios -->
+    <link rel="preconnect" href="https://placehold.co" />
+
+    <!-- ✅ Sin fuentes externas - usar sistema -->
+    <title>E-Commerce 2026</title>
+
+    <style>
+      /* ✅ CSS crítico inline - evita FOUC */
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont,
+          'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      #root { min-height: 100vh; }
+
+      /* Loading spinner inicial */
+      .app-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        flex-direction: column;
+        gap: 1rem;
+        color: white;
+      }
+
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- ✅ Loading inicial mientras React carga -->
+      <div class="app-loading">
+        <div class="spinner"></div>
+        <p>Cargando...</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

@@ -1,26 +1,43 @@
-// vite.config.js
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
+// vite.config.js - REEMPLAZAR COMPLETO
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@app": path.resolve(__dirname, "./src/app"),
-      "@config": path.resolve(__dirname, "./src/config"),
-      "@domain": path.resolve(__dirname, "./src/domain"),
-      "@application": path.resolve(__dirname, "./src/application"),
-      "@infrastructure": path.resolve(__dirname, "./src/infrastructure"),
-      "@presentation": path.resolve(__dirname, "./src/presentation"),
-    },
+      '@': path.resolve(__dirname, './src'),
+      '@app': path.resolve(__dirname, './src/app'),
+      '@config': path.resolve(__dirname, './src/config'),
+      '@presentation': path.resolve(__dirname, './src/presentation'),
+      '@infrastructure': path.resolve(__dirname, './src/infrastructure'),
+      '@domain': path.resolve(__dirname, './src/domain'),
+      '@styles': path.resolve(__dirname, './src/styles'),
+    }
   },
-  server: {
-    port: 3000,
-    open: true,
-  },
+
   build: {
-    outDir: "dist",
+    // ✅ Optimizar chunks
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          store: ['zustand'],
+        }
+      }
+    },
+    // ✅ Comprimir
+    minify: 'terser',
+    sourcemap: false,
+    chunkSizeWarningLimit: 600
   },
+
+  server: {
+    // ✅ Sin overlay de errores en producción
+    hmr: {
+      overlay: true
+    }
+  }
 });
