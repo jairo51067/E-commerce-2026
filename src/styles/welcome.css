@@ -178,6 +178,7 @@
 }
 
 .welcome-social a {
+   padding: 0.4rem 0.85rem;
   text-decoration: none;
   color: inherit; /* Mantiene el color original de tu diseño */
 }
