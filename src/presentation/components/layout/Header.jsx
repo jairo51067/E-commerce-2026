@@ -1,4 +1,4 @@
-// src/presentation/components/layout/Header.jsx - NUEVO COMPONENTE
+// src/presentation/components/layout/Header.jsx
 import React, { useState } from 'react';
 import { useAuth } from '@presentation/hooks/useAuth.js';
 import { usePermissions } from '@presentation/hooks/usePermissions.js';
@@ -14,11 +14,18 @@ export const Header = ({
   const { canManageProducts, canViewOrders } = usePermissions();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // ✅ Usuario interno = tiene rol de gestión
+  const isInternalUser = user && (
+    user.role === 'ADMIN' ||
+    user.role === 'GERENTE' ||
+    user.role === 'SUPERUSER'
+  );
+
   return (
     <header className="app-header">
       {/* LEFT: Logo */}
       <div className="header-left">
-        <h1>🛍️ <span>E-COMMERCE</span></h1>
+        <h1>🛍️ <span>E-COMMERCE 2026</span></h1>
       </div>
 
       {/* RIGHT DESKTOP */}
@@ -29,26 +36,44 @@ export const Header = ({
             <span className={`role-badge ${user.role.toLowerCase()}`}>
               {user.role}
             </span>
+
+            {/* ✅ Solo usuarios internos ven estos botones */}
             {canManageProducts && (
-              <button className="panel-btn admin" onClick={onOpenAdmin}>
+              <button
+                className="panel-btn admin"
+                onClick={onOpenAdmin}
+              >
                 ⚙️ Admin
               </button>
             )}
+
             {canViewOrders && (
-              <button className="panel-btn orders" onClick={onOpenOrders}>
+              <button
+                className="panel-btn orders"
+                onClick={onOpenOrders}
+              >
                 📋 Pedidos
               </button>
             )}
-            <CartBadge onClick={onOpenCart} />
+
+            {/* ✅ Carrito SOLO para clientes */}
+            {!isInternalUser && (
+              <CartBadge onClick={onOpenCart} />
+            )}
+
             <button className="logout-btn" onClick={signOut}>
-              Salir
+              🚪 Salir
             </button>
           </>
         ) : (
           <>
-            <button className="login-header-btn" onClick={onOpenLogin}>
+            <button
+              className="login-header-btn"
+              onClick={onOpenLogin}
+            >
               🔐 Login
             </button>
+            {/* ✅ Carrito siempre visible para no logueados */}
             <CartBadge onClick={onOpenCart} />
           </>
         )}
@@ -56,7 +81,10 @@ export const Header = ({
 
       {/* RIGHT MOBILE */}
       <div className="header-right mobile-nav">
-        <CartBadge onClick={onOpenCart} />
+        {/* ✅ Carrito mobile SOLO clientes */}
+        {!isInternalUser && (
+          <CartBadge onClick={onOpenCart} />
+        )}
         <button
           className="hamburger"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -67,7 +95,10 @@ export const Header = ({
 
       {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="mobile-menu" onClick={() => setMenuOpen(false)}>
+        <div
+          className="mobile-menu"
+          onClick={() => setMenuOpen(false)}
+        >
           {user ? (
             <>
               <div className="mobile-user-info">
@@ -76,22 +107,35 @@ export const Header = ({
                   {user.role}
                 </span>
               </div>
+
               {canManageProducts && (
                 <button
                   className="mobile-menu-item"
                   onClick={onOpenAdmin}
                 >
-                  ⚙️ Panel Admin
+                  ⚙️ Panel Administrador
                 </button>
               )}
+
               {canViewOrders && (
                 <button
                   className="mobile-menu-item"
                   onClick={onOpenOrders}
                 >
-                  📋 Panel Pedidos
+                  📋 Panel de Pedidos
                 </button>
               )}
+
+              {/* ✅ Carrito mobile solo clientes */}
+              {!isInternalUser && (
+                <button
+                  className="mobile-menu-item"
+                  onClick={onOpenCart}
+                >
+                  🛒 Ver Carrito
+                </button>
+              )}
+
               <button
                 className="mobile-menu-item logout"
                 onClick={signOut}
@@ -100,12 +144,20 @@ export const Header = ({
               </button>
             </>
           ) : (
-            <button
-              className="mobile-menu-item login"
-              onClick={onOpenLogin}
-            >
-              🔐 Iniciar Sesión
-            </button>
+            <>
+              <button
+                className="mobile-menu-item login"
+                onClick={onOpenLogin}
+              >
+                🔐 Iniciar Sesión
+              </button>
+              <button
+                className="mobile-menu-item"
+                onClick={onOpenCart}
+              >
+                🛒 Ver Carrito
+              </button>
+            </>
           )}
         </div>
       )}

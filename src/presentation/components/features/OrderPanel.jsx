@@ -1,10 +1,9 @@
-// src/presentation/components/features/OrderPanel.jsx - COMPLETO FINAL
+// src/presentation/components/features/OrderPanel.jsx
 import React, { useState } from 'react';
 import { useAuth } from '@presentation/hooks/useAuth.js';
 import { useStore } from '@presentation/store/index.js';
 import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Exporter } from '@infrastructure/utils/exporter.js';
-
 
 export const OrderPanel = ({ isOpen, onClose }) => {
   const { user } = useAuth();
@@ -19,102 +18,124 @@ export const OrderPanel = ({ isOpen, onClose }) => {
     : orders.filter(o => o.status === filter);
 
   const STATUS = {
-    pending: { label: '⏳ Pendiente', color: '#FF9500' },
-    paid: { label: '✅ Pagado', color: '#007AFF' },
-    shipped: { label: '🚚 Despachado', color: '#34C759' },
-    cancelled: { label: '❌ Cancelado', color: '#FF3B30' }
+    pending:   { label: '⏳ Pendiente',  color: '#FF9500' },
+    paid:      { label: '✅ Pagado',      color: '#007AFF' },
+    shipped:   { label: '🚚 Despachado', color: '#34C759' },
+    cancelled: { label: '❌ Cancelado',  color: '#FF3B30' }
   };
 
   const totalRevenue = orders
     .filter(o => o.status !== 'cancelled')
     .reduce((sum, o) => sum + Number(o.total), 0);
 
-  return (
-    <div className="panel-overlay" onClick={onClose}>
-      <div className="order-panel" onClick={e => e.stopPropagation()}>
+  const handleExport = () => {
+    try {
+      Exporter.ordersToCSV(orders);
+      Notifier.success('📊 Pedidos exportados a CSV!');
+    } catch (error) {
+      Notifier.error(error.message);
+    }
+  };
 
-        {/* HEADER */}
-        <div className="panel-header">
-          <div>
-            <h2>📋 Panel de Pedidos</h2>
-            <span className="panel-user">
-              👤 {user?.name} | {user?.role}
-            </span>
-          </div>
-          <button className="close-btn" onClick={onClose}>✕</button>
+  const handleUpdateStatus = (orderId, status, message) => {
+    updateOrderStatus(orderId, status);
+    Notifier.success(message);
+  };
+
+  return (
+    // ✅ FULL SCREEN
+    <div className="fullscreen-panel">
+
+      {/* HEADER */}
+      <div className="fullscreen-header">
+        <div className="fullscreen-header-left">
+          <h2>📋 Panel de Pedidos</h2>
+          <span className="panel-user">
+            👤 {user?.name} | {user?.role}
+          </span>
         </div>
 
-        <div className="panel-header-actions">
+        {/* ✅ ACCIONES - Una sola X */}
+        <div className="fullscreen-header-actions">
           <button
             className="export-btn"
-            onClick={() => {
-              try {
-                Exporter.ordersToCSV(orders);
-                Notifier.success('📊 Pedidos exportados a CSV!');
-              } catch (error) {
-                Notifier.error(error.message);
-              }
-            }}
+            onClick={handleExport}
           >
-            📊 Exportar CSV
+            📊 Exportar Informe CSV
           </button>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button
+            className="store-btn"
+            onClick={onClose}
+          >
+            🏪 Ir a la Tienda
+          </button>
+          {/* ✅ SOLO UNA X */}
+          <button
+            className="close-fullscreen-btn"
+            onClick={onClose}
+            title="Cerrar panel"
+          >
+            ✕
+          </button>
         </div>
+      </div>
 
-        {/* STATS */}
-        <div className="order-stats">
-          <div className="stat-box">
-            <strong>{orders.length}</strong>
-            <span>Total Pedidos</span>
-          </div>
-          <div className="stat-box" style={{ background: '#FFF3E0' }}>
-            <strong style={{ color: '#FF9500' }}>
-              {orders.filter(o => o.status === 'pending').length}
-            </strong>
-            <span>Pendientes</span>
-          </div>
-          <div className="stat-box" style={{ background: '#E3F2FD' }}>
-            <strong style={{ color: '#007AFF' }}>
-              {orders.filter(o => o.status === 'paid').length}
-            </strong>
-            <span>Pagados</span>
-          </div>
-          <div className="stat-box" style={{ background: '#E8F5E9' }}>
-            <strong style={{ color: '#34C759' }}>
-              {orders.filter(o => o.status === 'shipped').length}
-            </strong>
-            <span>Despachados</span>
-          </div>
-          <div className="stat-box" style={{ background: '#F3E5F5' }}>
-            <strong style={{ color: '#764ba2' }}>
-              ${totalRevenue.toFixed(2)}
-            </strong>
-            <span>Ingresos</span>
-          </div>
+      {/* STATS */}
+      <div className="order-stats">
+        <div className="stat-box">
+          <strong>{orders.length}</strong>
+          <span>Total Pedidos</span>
         </div>
-
-        {/* FILTROS */}
-        <div className="order-filters">
-          {['all', 'pending', 'paid', 'shipped', 'cancelled'].map(f => (
-            <button
-              key={f}
-              className={`filter-btn ${filter === f ? 'active' : ''}`}
-              onClick={() => setFilter(f)}
-            >
-              {f === 'all' ? '📋 Todos' : STATUS[f]?.label}
-            </button>
-          ))}
+        <div className="stat-box" style={{background: '#FFF3E0'}}>
+          <strong style={{color: '#FF9500'}}>
+            {orders.filter(o => o.status === 'pending').length}
+          </strong>
+          <span>Pendientes</span>
         </div>
+        <div className="stat-box" style={{background: '#E3F2FD'}}>
+          <strong style={{color: '#007AFF'}}>
+            {orders.filter(o => o.status === 'paid').length}
+          </strong>
+          <span>Pagados</span>
+        </div>
+        <div className="stat-box" style={{background: '#E8F5E9'}}>
+          <strong style={{color: '#34C759'}}>
+            {orders.filter(o => o.status === 'shipped').length}
+          </strong>
+          <span>Despachados</span>
+        </div>
+        <div className="stat-box" style={{background: '#F3E5F5'}}>
+          <strong style={{color: '#764ba2'}}>
+            ${totalRevenue.toFixed(2)}
+          </strong>
+          <span>Ingresos</span>
+        </div>
+      </div>
 
-        {/* LISTA PEDIDOS */}
+      {/* FILTROS */}
+      <div className="order-filters">
+        {['all', 'pending', 'paid', 'shipped', 'cancelled'].map(f => (
+          <button
+            key={f}
+            className={`filter-btn ${filter === f ? 'active' : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f === 'all' ? '📋 Todos' : STATUS[f]?.label}
+          </button>
+        ))}
+      </div>
+
+      {/* CONTENT */}
+      <div className="fullscreen-content">
         <div className="orders-list">
+
           {filteredOrders.length === 0 ? (
             <div className="empty-orders">
               <p>📭 No hay pedidos</p>
               <span>
                 {filter !== 'all'
                   ? `con estado "${STATUS[filter]?.label}"`
-                  : 'aún'
+                  : 'aún. Los pedidos aparecerán aquí.'
                 }
               </span>
             </div>
@@ -149,6 +170,7 @@ export const OrderPanel = ({ isOpen, onClose }) => {
                         : '🏪 Retiro en tienda'
                       }
                     </p>
+                    <p>🛒 {order.items?.length} artículos</p>
                   </div>
 
                   {/* ITEMS */}
@@ -177,54 +199,58 @@ export const OrderPanel = ({ isOpen, onClose }) => {
                     )}
                     <div className="order-total-row total">
                       <strong>TOTAL:</strong>
-                      <strong style={{ color: '#34C759' }}>
+                      <strong style={{color: '#34C759'}}>
                         ${Number(order.total).toFixed(2)}
                       </strong>
                     </div>
                   </div>
                 </div>
 
-                {/* ACCIONES SEGÚN ROL Y STATUS */}
+                {/* ACCIONES */}
                 <div className="order-actions">
-
-                  {/* PENDING → Marcar Pagado o Cancelar */}
                   {order.status === 'pending' && (
                     <>
                       <button
                         className="btn-paid"
-                        onClick={() => {
-                          updateOrderStatus(order.id, 'paid');
-                          Notifier.success('✅ Pedido marcado como pagado');
-                        }}
+                        onClick={() => handleUpdateStatus(
+                          order.id,
+                          'paid',
+                          '✅ Pedido marcado como pagado'
+                        )}
                       >
                         ✅ Marcar Pagado
                       </button>
                       {(user?.role === 'GERENTE' ||
                         user?.role === 'ADMIN' ||
                         user?.role === 'SUPERUSER') && (
-                          <button
-                            className="btn-cancel-order"
-                            onClick={() => {
-                              if (window.confirm('¿Cancelar pedido?')) {
-                                updateOrderStatus(order.id, 'cancelled');
-                                Notifier.warning('❌ Pedido cancelado');
-                              }
-                            }}
-                          >
-                            ❌ Cancelar
-                          </button>
-                        )}
+                        <button
+                          className="btn-cancel-order"
+                          onClick={() => {
+                            if (window.confirm('¿Cancelar este pedido?')) {
+                              handleUpdateStatus(
+                                order.id,
+                                'cancelled',
+                                '❌ Pedido cancelado'
+                              );
+                            }
+                          }}
+                        >
+                          ❌ Cancelar
+                        </button>
+                      )}
                     </>
                   )}
 
-                  {/* PAID → Despachar */}
                   {order.status === 'paid' && (
                     <button
                       className="btn-ship"
                       onClick={() => {
-                        if (window.confirm('¿Confirmar despacho?')) {
-                          updateOrderStatus(order.id, 'shipped');
-                          Notifier.success('🚚 Pedido despachado!');
+                        if (window.confirm('¿Confirmar despacho del pedido?')) {
+                          handleUpdateStatus(
+                            order.id,
+                            'shipped',
+                            '🚚 Pedido despachado!'
+                          );
                         }
                       }}
                     >
@@ -232,26 +258,23 @@ export const OrderPanel = ({ isOpen, onClose }) => {
                     </button>
                   )}
 
-                  {/* SHIPPED → Inmutable */}
                   {order.status === 'shipped' && (
                     <div className="shipped-label">
-                      ✅ Pedido Despachado - No modificable
+                      ✅ Pedido Despachado - Completado
                     </div>
                   )}
 
-                  {/* CANCELLED */}
                   {order.status === 'cancelled' && (
                     <div className="cancelled-label">
                       ❌ Pedido Cancelado
                     </div>
                   )}
-
                 </div>
+
               </div>
             ))
           )}
         </div>
-
       </div>
     </div>
   );

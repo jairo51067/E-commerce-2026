@@ -1,24 +1,20 @@
+// src/presentation/components/features/AdminPanel.jsx
 import React, { useState } from 'react';
 import { useStore } from '@presentation/store/index.js';
 import { useAuth } from '@presentation/hooks/useAuth.js';
-// 1. INTEGRACIÓN DE IMPORTS
 import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Exporter } from '@infrastructure/utils/exporter.js';
 
 const EMPTY_PRODUCT = {
-  name: '',
-  price: '',
-  stock: '',
-  image: '',
-  category: 'electronics'
+  name: '', price: '', stock: '', image: '', category: 'electronics'
 };
 
 const CATEGORIES = [
-  { value: 'electronics', label: '📱 Electrónicos' },
-  { value: 'accessories', label: '🎧 Accesorios' },
-  { value: 'clothing', label: '👕 Ropa' },
-  { value: 'food', label: '🍕 Comida' },
-  { value: 'other', label: '📦 Otros' }
+  { value: 'electronics',  label: '📱 Electrónicos' },
+  { value: 'accessories',  label: '🎧 Accesorios' },
+  { value: 'clothing',     label: '👕 Ropa' },
+  { value: 'food',         label: '🍕 Comida' },
+  { value: 'other',        label: '📦 Otros' }
 ];
 
 export const AdminPanel = ({ isOpen, onClose }) => {
@@ -41,7 +37,6 @@ export const AdminPanel = ({ isOpen, onClose }) => {
     setView('edit');
   };
 
-  // 2. INTEGRACIÓN DE handleDelete (Con Notifier)
   const handleDelete = (productId) => {
     if (window.confirm('¿Eliminar este producto?')) {
       deleteProduct(productId);
@@ -49,7 +44,6 @@ export const AdminPanel = ({ isOpen, onClose }) => {
     }
   };
 
-  // 3. INTEGRACIÓN DE handleSave (Con validaciones de Notifier)
   const handleSave = () => {
     if (!form.name || !form.price || !form.stock) {
       Notifier.warning('⚠️ Completa nombre, precio y stock');
@@ -75,75 +69,93 @@ export const AdminPanel = ({ isOpen, onClose }) => {
     setForm(EMPTY_PRODUCT);
   };
 
+  const handleExport = () => {
+    try {
+      Exporter.productsToCSV(products);
+      Notifier.success('📊 Productos exportados a CSV!');
+    } catch (error) {
+      Notifier.error(error.message);
+    }
+  };
+
   return (
-    <div className="panel-overlay" onClick={onClose}>
-      <div className="admin-panel" onClick={e => e.stopPropagation()}>
+    // ✅ FULL SCREEN
+    <div className="fullscreen-panel">
 
-        {/* HEADER */}
-        <div className="panel-header">
-          <div>
-            <h2>⚙️ Panel Administrador</h2>
-            <span className="panel-user">
-              👤 {user?.name} | {user?.role}
-            </span>
-          </div>
-          <button className="close-btn" onClick={onClose}>✕</button>
+      {/* HEADER FULL SCREEN */}
+      <div className="fullscreen-header">
+        <div className="fullscreen-header-left">
+          <h2>⚙️ Panel Administrador</h2>
+          <span className="panel-user">
+            👤 {user?.name} | {user?.role}
+          </span>
         </div>
 
-        {/* STATS */}
-        <div className="admin-stats">
-          <div className="stat-box">
-            <strong>{products.length}</strong>
-            <span>Productos</span>
-          </div>
-          <div className="stat-box">
-            <strong>{products.filter(p => p.stock > 0).length}</strong>
-            <span>Con Stock</span>
-          </div>
-          <div className="stat-box">
-            <strong>{products.filter(p => p.stock === 0).length}</strong>
-            <span>Sin Stock</span>
-          </div>
-          <div className="stat-box">
-            <strong>
-              ${products.reduce((sum, p) => sum + (p.price * p.stock), 0).toFixed(0)}
-            </strong>
-            <span>Valor Inventario</span>
-          </div>
-        </div>
-
-        {/* TABS Y BOTÓN EXPORTAR */}
-        <div className="panel-tabs" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <button
-              className={`tab ${view === 'list' ? 'active' : ''}`}
-              onClick={() => setView('list')}
-            >
-              📦 Productos
-            </button>
-            <button
-              className={`tab ${view === 'add' ? 'active' : ''}`}
-              onClick={() => { setForm(EMPTY_PRODUCT); setView('add'); }}
-            >
-              ➕ Nuevo Producto
-            </button>
-          </div>
-
-          {/* 4. INTEGRACIÓN DEL BOTÓN EXPORT */}
+        {/* ✅ ACCIONES - Una sola X */}
+        <div className="fullscreen-header-actions">
           <button
             className="export-btn"
-            onClick={() => {
-              try {
-                Exporter.productsToCSV(products);
-                Notifier.success('📊 Productos exportados a CSV!');
-              } catch (error) {
-                Notifier.error(error.message);
-              }
-            }}
+            onClick={handleExport}
           >
-            📊 Exportar CSV
+            📊 Exportar Informe CSV
+          </button>
+          <button
+            className="store-btn"
+            onClick={onClose}
+          >
+            🏪 Ir a la Tienda
+          </button>
+          {/* ✅ SOLO UNA X */}
+          <button
+            className="close-fullscreen-btn"
+            onClick={onClose}
+            title="Cerrar panel"
+          >
+            ✕
           </button>
         </div>
+      </div>
+
+      {/* STATS */}
+      <div className="admin-stats">
+        <div className="stat-box">
+          <strong>{products.length}</strong>
+          <span>Productos</span>
+        </div>
+        <div className="stat-box">
+          <strong>{products.filter(p => p.stock > 0).length}</strong>
+          <span>Con Stock</span>
+        </div>
+        <div className="stat-box">
+          <strong>{products.filter(p => p.stock === 0).length}</strong>
+          <span>Sin Stock</span>
+        </div>
+        <div className="stat-box">
+          <strong>
+            ${products.reduce((s, p) => s + (p.price * p.stock), 0).toFixed(0)}
+          </strong>
+          <span>Valor Inventario</span>
+        </div>
+      </div>
+
+      {/* TABS */}
+      <div className="panel-tabs">
+        <button
+          className={`tab ${view === 'list' ? 'active' : ''}`}
+          onClick={() => setView('list')}
+        >
+          📦 Productos ({products.length})
+        </button>
+        <button
+          className={`tab ${view === 'add' ? 'active' : ''}`}
+          onClick={() => { setForm(EMPTY_PRODUCT); setView('add'); }}
+        >
+          ➕ Nuevo Producto
+        </button>
+      </div>
+
+      {/* CONTENT */}
+      <div className="fullscreen-content">
 
         {/* LISTA */}
         {view === 'list' && (
@@ -155,36 +167,38 @@ export const AdminPanel = ({ isOpen, onClose }) => {
               onChange={e => setSearch(e.target.value)}
             />
 
-            {filteredProducts.map(product => (
-              <div key={product.id} className="product-row">
-                <img
-                  src={product.image || 'https://via.placeholder.com/60'}
-                  alt={product.name}
-                />
-                <div className="product-row-info">
-                  <strong>{product.name}</strong>
-                  <span>
-                    💰 ${product.price} |
-                    📦 Stock: {product.stock} |
-                    🏷️ {product.category}
-                  </span>
+            <div className="products-admin-grid">
+              {filteredProducts.map(product => (
+                <div key={product.id} className="product-row">
+                  <img
+                    src={product.image || 'https://via.placeholder.com/60'}
+                    alt={product.name}
+                  />
+                  <div className="product-row-info">
+                    <strong>{product.name}</strong>
+                    <span>
+                      💰 ${product.price} |
+                      📦 Stock: {product.stock} |
+                      🏷️ {product.category}
+                    </span>
+                  </div>
+                  <div className="product-row-actions">
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleEdit(product)}
+                    >
+                      ✏️ Editar
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(product.id)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
-                <div className="product-row-actions">
-                  <button
-                    className="btn-edit"
-                    onClick={() => handleEdit(product)}
-                  >
-                    ✏️ Editar
-                  </button>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(product.id)}
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
@@ -234,7 +248,7 @@ export const AdminPanel = ({ isOpen, onClose }) => {
             {form.image && (
               <div className="image-preview">
                 <img src={form.image} alt="Preview" />
-                <span>Preview</span>
+                <span>Preview imagen</span>
               </div>
             )}
 
@@ -249,12 +263,11 @@ export const AdminPanel = ({ isOpen, onClose }) => {
                 className="btn-save"
                 onClick={handleSave}
               >
-                {view === 'add' ? '➕ Agregar' : '💾 Guardar'}
+                {view === 'add' ? '➕ Agregar Producto' : '💾 Guardar Cambios'}
               </button>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
