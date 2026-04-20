@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
+  base: '/E-commerce-2026/', // 👈 Agrega esto justo aquí
   plugins: [react()],
 
   resolve: {
