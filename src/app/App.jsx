@@ -8,7 +8,7 @@ import { MiniCart } from '@presentation/components/ui/MiniCart.jsx';
 import { Checkout } from '@presentation/components/features/Checkout.jsx';
 import { AdminPanel } from '@presentation/components/features/AdminPanel.jsx';
 import { OrderPanel } from '@presentation/components/features/OrderPanel.jsx';
-import './App.css';
+import '../styles/index.css';
 
 function App() {
   const { products } = useStore();

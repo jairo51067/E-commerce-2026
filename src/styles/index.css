@@ -1,0 +1,13 @@
+/* ===== ESTILOS GLOBALES - IMPORTA EN ORDEN ===== */
+@import './variables.css';
+@import './reset.css';
+@import './layout.css';
+@import './components.css';
+@import './products.css';
+@import './cart.css';
+@import './checkout.css';
+@import './panels.css';
+@import './modals.css';
+@import './toast.css';
+@import './responsive.css'; 
+

@@ -1,0 +1,107 @@
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: var(--z-modal);
+  backdrop-filter: blur(4px);
+}
+
+/* ===== MODAL CONTENT ===== */
+.modal-content {
+  background: var(--white);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-3xl) var(--space-2xl);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  color: var(--gray-800);
+  font-size: 1.3rem;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 0.85rem var(--space-lg);
+  border: 1.5px solid var(--gray-400);
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  margin-bottom: var(--space-md);
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  font-family: var(--font-family);
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.modal-content button[type="submit"] {
+  width: 100%;
+  padding: var(--space-lg);
+  background: var(--primary-gradient);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: var(--transition);
+}
+
+.modal-content button[type="submit"]:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+}
+
+/* ===== DEMO USERS ===== */
+.demo-users {
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  margin-bottom: var(--space-md);
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  border-left: 3px solid var(--primary);
+}
+
+.demo-users p {
+  margin: 0.2rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.demo-users strong {
+  color: var(--gray-800);
+}
+
+/* ===== MODAL CLOSE ===== */
+.modal-close {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  background: var(--gray-200);
+  border: none;
+  border-radius: var(--radius-full);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.modal-close:hover {
+  background: var(--danger);
+  color: var(--white);
+}

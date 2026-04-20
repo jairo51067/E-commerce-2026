@@ -1,0 +1,217 @@
+/* ===== ROLE BADGE ===== */
+.role-badge {
+  padding: var(--space-xs) 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+}
+
+.role-badge.gerente   { background: var(--warning); }
+.role-badge.admin     { background: var(--success); }
+.role-badge.superuser { background: var(--danger); }
+
+/* ===== PANEL BUTTONS ===== */
+.panel-btn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.panel-btn.admin  { background: var(--primary-gradient); color: var(--white); }
+.panel-btn.orders { background: var(--warning-gradient); color: var(--white); }
+
+.panel-btn:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== CART TOGGLE ===== */
+.cart-toggle {
+  background: var(--danger) !important;
+  color: var(--white) !important;
+  border: none !important;
+  padding: 0.4rem 0.8rem !important;
+  border-radius: var(--radius-pill) !important;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  transition: var(--transition);
+}
+
+.cart-count {
+  background: var(--white);
+  color: var(--danger);
+  border-radius: var(--radius-full);
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== CLOSE BUTTON ===== */
+.close-btn {
+  background: var(--danger) !important;
+  color: var(--white) !important;
+  border: none !important;
+  border-radius: var(--radius-full) !important;
+  width: 32px !important;
+  height: 32px !important;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.close-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ===== EXPORT BUTTON ===== */
+.export-btn {
+  padding: 0.4rem 0.85rem;
+  background: rgba(255,255,255,0.2);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.export-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.05);
+}
+
+/* ===== PANEL HEADER ACTIONS ===== */
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* ===== FORM INPUTS BASE ===== */
+.input-base {
+  width: 100%;
+  padding: 0.85rem;
+  border: 1.5px solid var(--gray-400);
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ===== BUTTONS BASE ===== */
+.btn-primary {
+  padding: 0.85rem var(--space-lg);
+  background: var(--primary-gradient);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: var(--font-md);
+  transition: var(--transition);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+}
+
+.btn-success {
+  padding: 0.85rem var(--space-lg);
+  background: var(--success-gradient);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: var(--font-md);
+  transition: var(--transition);
+}
+
+.btn-success:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(52,199,89,0.4);
+}
+
+.btn-danger {
+  padding: 0.85rem var(--space-lg);
+  background: var(--danger-gradient);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: var(--font-md);
+  transition: var(--transition);
+}
+
+.btn-danger:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ===== STATUS BADGE ===== */
+.status-badge {
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  color: var(--white);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== LOGIN BUTTON ===== */
+.login-btn {
+  width: 100%;
+  padding: var(--space-lg);
+  background: var(--primary-gradient);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: var(--transition);
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

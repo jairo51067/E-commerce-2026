@@ -1,0 +1,197 @@
+/* ===== APP ===== */
+.app {
+  min-height: 100vh;
+  background: var(--primary-gradient);
+  font-family: var(--font-family);
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--space-sm);
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.5rem;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.header-left h1 {
+  font-size: 1.3rem;
+  color: var(--white);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* DESKTOP NAV */
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* MOBILE NAV */
+.mobile-nav {
+  display: none;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* HAMBURGER */
+.hamburger {
+  background: rgba(255,255,255,0.2) !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  color: var(--white) !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 1.2rem !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  transition: var(--transition);
+}
+
+.hamburger:hover {
+  background: rgba(255,255,255,0.3) !important;
+}
+
+/* MOBILE MENU */
+.mobile-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(30,20,60,0.97);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  z-index: var(--z-mobile-menu);
+  animation: fadeIn 0.2s ease;
+}
+
+.mobile-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+  color: var(--white);
+  font-size: var(--font-base);
+}
+
+.mobile-menu-item {
+  width: 100%;
+  padding: 0.85rem var(--space-lg);
+  background: rgba(255,255,255,0.08);
+  color: var(--white) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-base);
+  font-weight: 500;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.mobile-menu-item:hover {
+  background: rgba(255,255,255,0.15) !important;
+}
+
+.mobile-menu-item.logout {
+  background: rgba(255,59,48,0.2) !important;
+  border-color: rgba(255,59,48,0.3) !important;
+  color: #FF6B6B !important;
+}
+
+.mobile-menu-item.login {
+  background: var(--primary-gradient) !important;
+  border-color: transparent !important;
+  text-align: center;
+}
+
+/* HEADER ELEMENTS */
+.user-name {
+  color: var(--white);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.login-header-btn {
+  padding: 0.45rem var(--space-lg) !important;
+  background: rgba(255,255,255,0.15) !important;
+  color: var(--white) !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.88rem !important;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.login-header-btn:hover {
+  background: rgba(255,255,255,0.25) !important;
+}
+
+.logout-btn {
+  padding: 0.45rem 0.85rem !important;
+  background: rgba(255,59,48,0.25) !important;
+  color: var(--white) !important;
+  border: 1px solid rgba(255,59,48,0.4) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.85rem !important;
+  transition: var(--transition);
+}
+
+.logout-btn:hover {
+  background: rgba(255,59,48,0.4) !important;
+}
+
+/* ===== HERO ===== */
+.hero {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-lg);
+  color: var(--white);
+}
+
+.hero h2 {
+  font-size: var(--font-3xl);
+  margin-bottom: var(--space-sm);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.hero p {
+  opacity: 0.85;
+  font-size: var(--font-md);
+}
+
+/* ===== FOOTER ===== */
+.app-footer {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: auto;
+}

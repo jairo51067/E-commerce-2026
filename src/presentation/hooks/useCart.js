@@ -1,5 +1,6 @@
-// src/presentation/hooks/useCart.js - REEMPLAZAR COMPLETO
+// src/presentation/hooks/useCart.js - FIX DEFINITIVO
 import { useStore } from '../store/index.js';
+import { useMemo } from 'react';
 
 export const useCart = () => {
   const cart = useStore((state) => state.cart);
@@ -9,14 +10,20 @@ export const useCart = () => {
   const clearCart = useStore((state) => state.clearCart);
   const addOrder = useStore((state) => state.addOrder);
 
-  // ✅ Calcular DIRECTO del cart
-  const cartTotal = cart.reduce(
-    (sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0
-  );
+  // ✅ useMemo para recalcular SOLO cuando cart cambia
+  const cartTotal = useMemo(() => {
+    return cart.reduce((sum, item) => {
+      const price = Number(item.price) || 0;
+      const qty = Number(item.quantity) || 0;
+      return sum + (price * qty);
+    }, 0);
+  }, [cart]);
 
-  const cartQuantity = cart.reduce(
-    (sum, item) => sum + Number(item.quantity), 0
-  );
+  const cartQuantity = useMemo(() => {
+    return cart.reduce((sum, item) => {
+      return sum + (Number(item.quantity) || 0);
+    }, 0);
+  }, [cart]);
 
   return {
     cart,
