@@ -60,7 +60,7 @@ const INITIAL_PRODUCTS = [
     isNew: false,
     isOffer: true,
     image: 'https://placehold.co/400x300/FF9500/white?text=Apple+Watch',
-    stock: 0,
+    stock: 6,
     category: 'accessories'
   },
   {
@@ -160,26 +160,88 @@ export const useStore = create(
         products: state.products.filter(p => p.id !== productId)
       })),
 
-      // ✅ Reset productos a los iniciales
+      // ✅ NUEVO: Descontar stock al vender
+      decreaseStock: (items) => set((state) => ({
+        products: state.products.map(product => {
+          const soldItem = items.find(item => item.id === product.id);
+          if (soldItem) {
+            return {
+              ...product,
+              stock: Math.max(0, product.stock - soldItem.quantity)
+            };
+          }
+          return product;
+        })
+      })),
+
+      // ✅ NUEVO: Restaurar stock al cancelar pedido
+      restoreStock: (items) => set((state) => ({
+        products: state.products.map(product => {
+          const item = items.find(i => i.id === product.id);
+          if (item) {
+            return {
+              ...product,
+              stock: product.stock + item.quantity
+            };
+          }
+          return product;
+        })
+      })),
+
       resetProducts: () => set({ products: INITIAL_PRODUCTS }),
 
       // ===== ORDERS =====
       orders: [],
 
-      addOrder: (order) => set((state) => ({
-        orders: [order, ...state.orders]
-      })),
+      addOrder: (order) => set((state) => {
+        // ✅ Descontar stock al crear pedido
+        const updatedProducts = state.products.map(product => {
+          const soldItem = order.items.find(item => item.id === product.id);
+          if (soldItem) {
+            return {
+              ...product,
+              stock: Math.max(0, product.stock - soldItem.quantity)
+            };
+          }
+          return product;
+        });
 
-      updateOrderStatus: (orderId, status) => set((state) => ({
-        orders: state.orders.map(o =>
-          o.id === orderId
-            ? { ...o, status, updatedAt: new Date().toISOString() }
-            : o
-        )
-      }))
+        return {
+          orders: [order, ...state.orders],
+          products: updatedProducts
+        };
+      }),
+
+      updateOrderStatus: (orderId, status) => set((state) => {
+        const order = state.orders.find(o => o.id === orderId);
+
+        // ✅ Si se cancela pedido → restaurar stock
+        let updatedProducts = state.products;
+        if (order && status === 'cancelled' && order.status !== 'cancelled') {
+          updatedProducts = state.products.map(product => {
+            const item = order.items.find(i => i.id === product.id);
+            if (item) {
+              return {
+                ...product,
+                stock: product.stock + item.quantity
+              };
+            }
+            return product;
+          });
+        }
+
+        return {
+          orders: state.orders.map(o =>
+            o.id === orderId
+              ? { ...o, status, updatedAt: new Date().toISOString() }
+              : o
+          ),
+          products: updatedProducts
+        };
+      })
     }),
     {
-      name: 'ecommerce-store-v5',  // ✅ Nueva versión = limpia cache
+      name: 'ecommerce-store-v6',
       partialize: (state) => ({
         user: state.user,
         cart: state.cart,

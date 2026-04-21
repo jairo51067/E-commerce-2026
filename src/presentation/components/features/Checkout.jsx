@@ -1,63 +1,175 @@
-// src/presentation/components/features/Checkout.jsx - COMPLETO FINAL
+// src/presentation/components/features/Checkout.jsx
 import React, { useState } from 'react';
 import { useCart } from '@presentation/hooks/useCart.js';
-import { useStore } from '@presentation/store/index.js';
-import { WhatsAppService } from '@infrastructure/integrations/WhatsAppService.js';
 import { Notifier } from '@infrastructure/utils/notifier.js';
-
-const DELIVERY_COST = 5.00;
+import { Validators } from '@infrastructure/utils/validators.js';
+import { STORE_CONFIG } from '@config/store.config.js';
+import { OrderSuccessModal } from '@presentation/components/ui/OrderSuccessModal.jsx';
 
 export const Checkout = ({ isOpen, onClose }) => {
-  const { cart, cartTotal, clearCart } = useCart();
-  const { addOrder } = useStore();
+  const { cart, cartTotal, clearCart, addOrder } = useCart();
 
-  const [customer, setCustomer] = useState({
+  const [form, setForm] = useState({
     name: '',
     phone: '',
     address: '',
     deliveryType: 'pickup'
   });
-  const [loading, setLoading] = useState(false);
 
-  // ✅ CRÍTICO: Si no está abierto NO renderiza
-  if (!isOpen) return null;
+  const [errors, setErrors] = useState({});
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [successOrder, setSuccessOrder] = useState(null);
 
-  const isDelivery = customer.deliveryType === 'delivery';
-  const deliveryCost = isDelivery ? DELIVERY_COST : 0;
+  if (!isOpen && !successOrder) return null;
+
+  const deliveryCost = form.deliveryType === 'delivery'
+    ? STORE_CONFIG.deliveryCost
+    : 0;
+
   const finalTotal = cartTotal + deliveryCost;
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const validateForm = () => {
+    const newErrors = {};
 
-  try {
-    const order = {
-      id: `ORD-${Date.now()}`,
-      items: [...cart],
-      customer: { ...customer },
-      subtotal: cartTotal,
-      deliveryCost,
-      total: finalTotal,
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    };
+    const nameVal = Validators.name(form.name);
+    if (!nameVal.valid) newErrors.name = nameVal.error;
 
-    addOrder(order);
-    WhatsAppService.sendOrder(order, customer.phone);
+    const phoneVal = Validators.phone(form.phone);
+    if (!phoneVal.valid) newErrors.phone = phoneVal.error;
 
-    Notifier.whatsapp('📱 Pedido enviado por WhatsApp!', 4000);
-    Notifier.order(`📦 Pedido #${order.id} creado`, 4000);
+    if (form.deliveryType === 'delivery') {
+      const addressVal = Validators.address(form.address);
+      if (!addressVal.valid) newErrors.address = addressVal.error;
+    }
 
-    clearCart();
-    setCustomer({ name: '', phone: '', address: '', deliveryType: 'pickup' });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    setForm({ ...form, phone: value });
+
+    if (errors.phone) {
+      setErrors({ ...errors, phone: null });
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      Notifier.error('⚠️ Por favor revisa los datos');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const orderId = `ORD-${Date.now().toString().slice(-8)}`;
+      const phoneFormatted = Validators.formatPhoneWhatsApp(form.phone);
+
+      const order = {
+        id: orderId,
+        customer: {
+          name: form.name.trim(),
+          phone: form.phone,
+          phoneWhatsapp: phoneFormatted,
+          address: form.address.trim(),
+          deliveryType: form.deliveryType
+        },
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: Number(item.price),
+          quantity: Number(item.quantity),
+          image: item.image
+        })),
+        subtotal: Number(cartTotal.toFixed(2)),
+        deliveryCost: Number(deliveryCost.toFixed(2)),
+        total: Number(finalTotal.toFixed(2)),
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+
+      // ✅ Crear pedido (descuenta stock automáticamente)
+      addOrder(order);
+
+      // ✅ Construir mensaje WhatsApp
+      const itemsText = cart
+        .map(item =>
+          `• ${item.name}\n   ${item.quantity} × $${Number(item.price).toFixed(2)} = $${(item.price * item.quantity).toFixed(2)}`
+        )
+        .join('\n\n');
+
+      const deliveryText = form.deliveryType === 'delivery'
+        ? `🚚 *DELIVERY*\n📍 ${form.address}\n💰 Costo delivery: $${deliveryCost.toFixed(2)}`
+        : '🏪 *RETIRO EN TIENDA*';
+
+      const message = `🛒 *NUEVO PEDIDO #${orderId}*
+━━━━━━━━━━━━━━━━━━━
+
+👤 *Cliente:* ${form.name}
+📞 *Teléfono:* ${form.phone}
+
+${deliveryText}
+
+━━━━━━━━━━━━━━━━━━━
+📦 *PRODUCTOS:*
+
+${itemsText}
+
+━━━━━━━━━━━━━━━━━━━
+💰 *RESUMEN:*
+Subtotal: $${cartTotal.toFixed(2)}
+${deliveryCost > 0 ? `Delivery: $${deliveryCost.toFixed(2)}\n` : ''}*TOTAL: $${finalTotal.toFixed(2)}*
+
+━━━━━━━━━━━━━━━━━━━
+🏪 ${STORE_CONFIG.name}
+⏰ ${new Date().toLocaleString('es-VE')}
+
+_Pedido generado desde la app_ 📱`;
+
+      const whatsappUrl = `https://wa.me/${STORE_CONFIG.whatsapp}?text=${encodeURIComponent(message)}`;
+
+      // ✅ Guardar datos para modal éxito
+      setSuccessOrder({
+        id: orderId,
+        total: finalTotal,
+        whatsappUrl,
+        customerName: form.name
+      });
+
+      // ✅ Abrir WhatsApp
+      window.open(whatsappUrl, '_blank');
+
+      // ✅ Limpiar
+      clearCart();
+      setForm({ name: '', phone: '', address: '', deliveryType: 'pickup' });
+      setErrors({});
+
+      Notifier.success(`✅ Pedido #${orderId} creado!`);
+
+    } catch (error) {
+      Notifier.error('❌ Error al procesar pedido');
+      console.error(error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccessOrder(null);
     onClose();
+  };
 
-  } catch (error) {
-    Notifier.error('❌ Error: ' + error.message);
-  } finally {
-    setLoading(false);
+  // ✅ Si hay pedido exitoso → mostrar modal
+  if (successOrder) {
+    return (
+      <OrderSuccessModal
+        order={successOrder}
+        onClose={handleCloseSuccess}
+      />
+    );
   }
-};
 
   return (
     <div className="checkout-overlay" onClick={onClose}>
@@ -69,147 +181,158 @@ export const Checkout = ({ isOpen, onClose }) => {
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
-        {/* RESUMEN */}
+        {/* RESUMEN PEDIDO */}
         <div className="order-summary">
-          <h3>📦 Resumen ({cart.length} artículos)</h3>
-
+          <h3>📋 Tu Pedido ({cart.length} productos)</h3>
           {cart.map(item => (
             <div key={item.id} className="summary-item">
-              <span>{item.name} x{item.quantity}</span>
-              <span>${(Number(item.price) * Number(item.quantity)).toFixed(2)}</span>
+              <span>{item.name} × {item.quantity}</span>
+              <span>${(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
 
-          <div className="summary-divider" />
+          <div className="summary-divider"></div>
 
           <div className="summary-item">
             <span>Subtotal:</span>
             <span>${cartTotal.toFixed(2)}</span>
           </div>
 
-          {isDelivery && (
-            <div className="summary-item delivery-cost">
-              <span>🚚 Delivery:</span>
-              <span>+${DELIVERY_COST.toFixed(2)}</span>
+          {deliveryCost > 0 && (
+            <div className="summary-item">
+              <span className="delivery-cost">🚚 Delivery:</span>
+              <span className="delivery-cost">+${deliveryCost.toFixed(2)}</span>
             </div>
           )}
 
           <div className="total-line">
             <strong>TOTAL:</strong>
-            <strong style={{ color: '#34C759', fontSize: '1.4rem' }}>
+            <strong style={{color: '#34C759', fontSize: '1.3rem'}}>
               ${finalTotal.toFixed(2)}
             </strong>
           </div>
         </div>
 
-        {/* FORM */}
-        <form onSubmit={handleSubmit}>
+        {/* DATOS CLIENTE */}
+        <div className="form-section">
+          <h4>👤 Tus Datos</h4>
 
-          {/* DATOS CLIENTE */}
-          <div className="form-section">
-            <h4>👤 Datos del Cliente</h4>
-            <input
-              placeholder="Nombre completo *"
-              value={customer.name}
-              onChange={e => setCustomer({...customer, name: e.target.value})}
-              required
-            />
-            <input
-              type="tel"
-              placeholder="📱 WhatsApp (ej: 573001234567) *"
-              value={customer.phone}
-              onChange={e => setCustomer({...customer, phone: e.target.value})}
-              required
-            />
-          </div>
-
-          {/* TIPO ENTREGA */}
-          <div className="form-section">
-            <h4>🚚 Tipo de Entrega</h4>
-            <div className="delivery-options">
-
-              <label
-                className={`delivery-option ${customer.deliveryType === 'pickup' ? 'selected' : ''}`}
-              >
-                <input
-                  type="radio"
-                  name="deliveryType"
-                  value="pickup"
-                  checked={customer.deliveryType === 'pickup'}
-                  onChange={() => setCustomer({...customer, deliveryType: 'pickup'})}
-                />
-                <div className="option-content">
-                  <span className="option-icon">🏪</span>
-                  <div>
-                    <strong>Pasar a Buscar</strong>
-                    <p>Retiro en tienda - Gratis</p>
-                  </div>
-                </div>
-              </label>
-
-              <label
-                className={`delivery-option ${customer.deliveryType === 'delivery' ? 'selected' : ''}`}
-              >
-                <input
-                  type="radio"
-                  name="deliveryType"
-                  value="delivery"
-                  checked={customer.deliveryType === 'delivery'}
-                  onChange={() => setCustomer({...customer, deliveryType: 'delivery'})}
-                />
-                <div className="option-content">
-                  <span className="option-icon">🚚</span>
-                  <div>
-                    <strong>Delivery</strong>
-                    <p>Envío a domicilio +${DELIVERY_COST.toFixed(2)}</p>
-                  </div>
-                </div>
-              </label>
-
-            </div>
-          </div>
-
-          {/* DIRECCIÓN solo si delivery */}
-          {isDelivery && (
-            <div className="form-section">
-              <h4>📍 Dirección de Entrega</h4>
-              <textarea
-                placeholder="Calle, número, sector, referencias..."
-                value={customer.address}
-                onChange={e => setCustomer({...customer, address: e.target.value})}
-                rows="3"
-                required
-              />
-            </div>
+          <input
+            type="text"
+            placeholder="Nombre completo *"
+            value={form.name}
+            onChange={e => {
+              setForm({...form, name: e.target.value});
+              if (errors.name) setErrors({...errors, name: null});
+            }}
+            className={errors.name ? 'input-error' : ''}
+          />
+          {errors.name && (
+            <p className="error-msg">⚠️ {errors.name}</p>
           )}
 
-          {/* MÉTODOS DE PAGO */}
-          <div className="form-section payment-info">
-            <h4>💳 Métodos de Pago Aceptados</h4>
-            <div className="payment-methods">
-              <span>💵 Efectivo</span>
-              <span>📲 Pago Móvil</span>
-              <span>🏦 Transferencia</span>
-              <span>💳 Zelle</span>
-            </div>
-            <p className="payment-note">
-              ⚠️ Adjunta tu comprobante de pago en el chat de WhatsApp
-            </p>
+          <input
+            type="tel"
+            placeholder="Teléfono * (ej: 0414-1234567)"
+            value={form.phone}
+            onChange={handlePhoneChange}
+            className={errors.phone ? 'input-error' : ''}
+          />
+          {errors.phone && (
+            <p className="error-msg">⚠️ {errors.phone}</p>
+          )}
+          <p className="phone-hint">
+            💡 Formato: 0414-1234567 o +584141234567
+          </p>
+        </div>
+
+        {/* TIPO ENTREGA */}
+        <div className="form-section">
+          <h4>📦 Tipo de Entrega</h4>
+          <div className="delivery-options">
+
+            <label className={`delivery-option ${form.deliveryType === 'pickup' ? 'selected' : ''}`}>
+              <input
+                type="radio"
+                name="delivery"
+                value="pickup"
+                checked={form.deliveryType === 'pickup'}
+                onChange={e => setForm({...form, deliveryType: e.target.value})}
+              />
+              <div className="option-content">
+                <span className="option-icon">🏪</span>
+                <div>
+                  <strong>Retiro en Tienda</strong>
+                  <p>Sin costo adicional</p>
+                </div>
+              </div>
+            </label>
+
+            <label className={`delivery-option ${form.deliveryType === 'delivery' ? 'selected' : ''}`}>
+              <input
+                type="radio"
+                name="delivery"
+                value="delivery"
+                checked={form.deliveryType === 'delivery'}
+                onChange={e => setForm({...form, deliveryType: e.target.value})}
+              />
+              <div className="option-content">
+                <span className="option-icon">🚚</span>
+                <div>
+                  <strong>Delivery a Domicilio</strong>
+                  <p>+${STORE_CONFIG.deliveryCost.toFixed(2)} - Coordinamos por WhatsApp</p>
+                </div>
+              </div>
+            </label>
+
           </div>
+        </div>
 
-          {/* BOTÓN WHATSAPP */}
-          <button
-            type="submit"
-            disabled={loading || cart.length === 0}
-            className="whatsapp-btn"
-          >
-            {loading
-              ? '⏳ Procesando...'
-              : `📱 CONFIRMAR PEDIDO $${finalTotal.toFixed(2)}`
-            }
-          </button>
+        {/* DIRECCIÓN (solo si delivery) */}
+        {form.deliveryType === 'delivery' && (
+          <div className="form-section">
+            <h4>📍 Dirección de Entrega</h4>
+            <textarea
+              placeholder="Dirección completa (calle, casa/edificio, referencia)"
+              value={form.address}
+              onChange={e => {
+                setForm({...form, address: e.target.value});
+                if (errors.address) setErrors({...errors, address: null});
+              }}
+              rows={3}
+              className={errors.address ? 'input-error' : ''}
+            />
+            {errors.address && (
+              <p className="error-msg">⚠️ {errors.address}</p>
+            )}
+          </div>
+        )}
 
-        </form>
+        {/* INFO PAGO */}
+        <div className="form-section payment-info">
+          <h4>💳 Método de Pago</h4>
+          <div className="payment-methods">
+            <span>💵 Efectivo</span>
+            <span>💳 Tarjeta</span>
+            <span>📱 Pago Móvil</span>
+            <span>🏦 Transferencia</span>
+          </div>
+          <p className="payment-note">
+            💡 Coordinaremos el pago por WhatsApp
+          </p>
+        </div>
+        {/* BOTÓN WHATSAPP */}
+        <button
+          className="whatsapp-btn"
+          onClick={handleSubmit}
+          disabled={isProcessing || cart.length === 0}
+        >
+          {isProcessing
+            ? '⏳ Procesando pedido...'
+            : `💬 Enviar Pedido por WhatsApp - $${finalTotal.toFixed(2)}`
+          }
+        </button>
+
       </div>
     </div>
   );

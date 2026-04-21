@@ -218,3 +218,23 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ===== ERRORES CHECKOUT ===== */
+.input-error {
+  border-color: var(--danger) !important;
+  background: #fff5f5;
+}
+
+.error-msg {
+  color: var(--danger);
+  font-size: 0.82rem;
+  margin: -0.5rem 0 0.75rem 0;
+  font-weight: 500;
+}
+
+.phone-hint {
+  font-size: 0.78rem;
+  color: var(--gray-500);
+  margin: -0.25rem 0 0.75rem 0;
+  font-style: italic;
+}

@@ -9,6 +9,7 @@
 @import './modals.css';
 @import './toast.css';
 @import './welcome.css';
+@import './success.css';        /* ✅ NUEVO */
 @import './categories.css';
 @import './bottomnav.css';
 @import './responsive.css';
