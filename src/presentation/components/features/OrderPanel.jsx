@@ -5,7 +5,8 @@ import { useStore } from '@presentation/store/index.js';
 import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Exporter } from '@infrastructure/utils/exporter.js';
 
-export const OrderPanel = ({ isOpen, onClose }) => {
+export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
+  if (!isOpen) return null;
   const { user } = useAuth();
   const orders = useStore((state) => state.orders);
   const updateOrderStatus = useStore((state) => state.updateOrderStatus);
@@ -45,31 +46,20 @@ export const OrderPanel = ({ isOpen, onClose }) => {
   return (
     // ✅ FULL SCREEN
     <div className="fullscreen-panel">
-
-      {/* HEADER */}
       <div className="fullscreen-header">
         <div className="fullscreen-header-left">
           <h2>📋 Panel de Pedidos</h2>
-          <span className="panel-user">
-            👤 {user?.name} | {user?.role}
-          </span>
         </div>
 
-        {/* ✅ ACCIONES - Una sola X */}
         <div className="fullscreen-header-actions">
-          <button
-            className="export-btn"
-            onClick={handleExport}
-          >
+          <button className="export-btn">
             📊 Exportar Informe CSV
           </button>
-          <button
-            className="store-btn"
-            onClick={onClose}
-          >
+
+          <button className="store-btn" onClick={onGoStore}>
             🏪 Ir a la Tienda
           </button>
-          {/* ✅ SOLO UNA X */}
+
           <button
             className="close-fullscreen-btn"
             onClick={onClose}
@@ -79,7 +69,7 @@ export const OrderPanel = ({ isOpen, onClose }) => {
           </button>
         </div>
       </div>
-
+      
       {/* STATS */}
       <div className="order-stats">
         <div className="stat-box">

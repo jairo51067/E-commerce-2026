@@ -17,7 +17,9 @@ const CATEGORIES = [
   { value: 'other',        label: '📦 Otros' }
 ];
 
-export const AdminPanel = ({ isOpen, onClose }) => {
+export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
+  if (!isOpen) return null;
+
   const { user } = useAuth();
   const { products, addProduct, editProduct, deleteProduct } = useStore();
   const [view, setView] = useState('list');
@@ -81,31 +83,20 @@ export const AdminPanel = ({ isOpen, onClose }) => {
   return (
     // ✅ FULL SCREEN
     <div className="fullscreen-panel">
-
-      {/* HEADER FULL SCREEN */}
       <div className="fullscreen-header">
         <div className="fullscreen-header-left">
           <h2>⚙️ Panel Administrador</h2>
-          <span className="panel-user">
-            👤 {user?.name} | {user?.role}
-          </span>
         </div>
 
-        {/* ✅ ACCIONES - Una sola X */}
         <div className="fullscreen-header-actions">
-          <button
-            className="export-btn"
-            onClick={handleExport}
-          >
+          <button className="export-btn">
             📊 Exportar Informe CSV
           </button>
-          <button
-            className="store-btn"
-            onClick={onClose}
-          >
+
+          <button className="store-btn" onClick={onGoStore}>
             🏪 Ir a la Tienda
           </button>
-          {/* ✅ SOLO UNA X */}
+
           <button
             className="close-fullscreen-btn"
             onClick={onClose}
@@ -116,6 +107,7 @@ export const AdminPanel = ({ isOpen, onClose }) => {
         </div>
       </div>
 
+    
       {/* STATS */}
       <div className="admin-stats">
         <div className="stat-box">
