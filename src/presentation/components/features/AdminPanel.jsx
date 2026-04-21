@@ -4,6 +4,7 @@ import { useStore } from '@presentation/store/index.js';
 import { useAuth } from '@presentation/hooks/useAuth.js';
 import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Exporter } from '@infrastructure/utils/exporter.js';
+import { Dashboard } from './Dashboard.jsx';
 
 const EMPTY_PRODUCT = {
   name: '',
@@ -28,7 +29,7 @@ export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
   const { user } = useAuth();
   const { products, addProduct, editProduct, deleteProduct } = useStore();
 
-  const [view, setView] = useState('list');
+  const [view, setView] = useState('dashboard');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [form, setForm] = useState(EMPTY_PRODUCT);
   const [search, setSearch] = useState('');
@@ -117,10 +118,7 @@ export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
           <button className="store-btn" onClick={onClose}>
             🏪 Ir a la Tienda
           </button>
-          <button
-            className="logout-btn-panel"
-            onClick={onSignOut}
-          >
+          <button className="logout-btn-panel" onClick={onSignOut}>
             🚪 Cerrar Sesión
           </button>
           <button
@@ -133,34 +131,14 @@ export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
         </div>
       </div>
 
-      {/* ===== STATS ===== */}
-      <div className="admin-stats">
-        <div className="stat-box">
-          <strong>{products.length}</strong>
-          <span>Productos</span>
-        </div>
-        <div className="stat-box">
-          <strong>{products.filter(p => p.stock > 0).length}</strong>
-          <span>Con Stock</span>
-        </div>
-        <div className="stat-box">
-          <strong>{products.filter(p => p.stock === 0).length}</strong>
-          <span>Sin Stock</span>
-        </div>
-        <div className="stat-box">
-          <strong>{products.filter(p => p.isOffer).length}</strong>
-          <span>En Oferta</span>
-        </div>
-        <div className="stat-box">
-          <strong>
-            ${products.reduce((s, p) => s + (p.price * p.stock), 0).toFixed(0)}
-          </strong>
-          <span>Inventario</span>
-        </div>
-      </div>
-
       {/* ===== TABS ===== */}
       <div className="panel-tabs">
+        <button
+          className={`tab ${view === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setView('dashboard')}
+        >
+          📊 Dashboard
+        </button>
         <button
           className={`tab ${view === 'list' ? 'active' : ''}`}
           onClick={() => setView('list')}
@@ -177,6 +155,9 @@ export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
 
       {/* ===== CONTENT ===== */}
       <div className="fullscreen-content">
+
+        {/* DASHBOARD */}
+        {view === 'dashboard' && <Dashboard />}
 
         {/* LISTA */}
         {view === 'list' && (
@@ -288,7 +269,6 @@ export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
               />
             </div>
 
-            {/* Checkboxes Badges */}
             <div className="form-checkboxes">
               <label className="checkbox-label">
                 <input
@@ -322,16 +302,10 @@ export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
             )}
 
             <div className="form-actions">
-              <button
-                className="btn-cancel"
-                onClick={handleCancel}
-              >
+              <button className="btn-cancel" onClick={handleCancel}>
                 ✕ Cancelar
               </button>
-              <button
-                className="btn-save"
-                onClick={handleSave}
-              >
+              <button className="btn-save" onClick={handleSave}>
                 {view === 'add' ? '➕ Agregar Producto' : '💾 Guardar Cambios'}
               </button>
             </div>
