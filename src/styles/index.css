@@ -1,4 +1,3 @@
-/* ===== IMPORTAR TODO EN ORDEN ===== */
 @import './variables.css';
 @import './reset.css';
 @import './layout.css';
@@ -10,6 +9,6 @@
 @import './modals.css';
 @import './toast.css';
 @import './welcome.css';
-@import './categories.css';   /* ✅ NUEVO */
-@import './bottomnav.css';    /* ✅ NUEVO */
-@import './responsive.css';   /* ← Siempre al final */
+@import './categories.css';
+@import './bottomnav.css';
+@import './responsive.css';
