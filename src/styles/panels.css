@@ -704,3 +704,117 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ===== LOGOUT BUTTON EN PANEL ===== */
+.logout-btn-panel {
+  padding: 0.5rem 1rem;
+  background: rgba(255,59,48,0.25);
+  color: white;
+  border: 1px solid rgba(255,59,48,0.5);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.logout-btn-panel:hover {
+  background: var(--danger);
+  transform: scale(1.03);
+}
+
+/* ===== CHECKBOXES FORM ===== */
+.form-checkboxes {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--gray-800);
+  font-weight: 500;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.checkbox-label:hover {
+  color: var(--primary);
+}
+
+  /* ===== RESPONSIVE PANEL HEADER MOBILE ===== */
+  .fullscreen-header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .export-btn,
+  .store-btn,
+  .logout-btn-panel {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.78rem;
+    text-align: center;
+  }
+
+  .close-fullscreen-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .panel-user {
+    font-size: 0.75rem;
+  }
+
+  .admin-stats,
+  .order-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-checkboxes {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .products-admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+/* ===== RESPONSIVE MOBILE SMALL ===== */
+@media (max-width: 380px) {
+  .fullscreen-header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .export-btn,
+  .store-btn,
+  .logout-btn-panel {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .admin-stats,
+  .order-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}

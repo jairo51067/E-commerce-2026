@@ -5,8 +5,7 @@ import { useStore } from '@presentation/store/index.js';
 import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Exporter } from '@infrastructure/utils/exporter.js';
 
-export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
-  if (!isOpen) return null;
+export const OrderPanel = ({ isOpen, onClose, onSignOut }) => {
   const { user } = useAuth();
   const orders = useStore((state) => state.orders);
   const updateOrderStatus = useStore((state) => state.updateOrderStatus);
@@ -31,6 +30,10 @@ export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
 
   const handleExport = () => {
     try {
+      if (orders.length === 0) {
+        Notifier.warning('⚠️ No hay pedidos para exportar');
+        return;
+      }
       Exporter.ordersToCSV(orders);
       Notifier.success('📊 Pedidos exportados a CSV!');
     } catch (error) {
@@ -43,34 +46,46 @@ export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
     Notifier.success(message);
   };
 
+  const canCancel = user?.role === 'GERENTE' ||
+                    user?.role === 'ADMIN' ||
+                    user?.role === 'SUPERUSER';
+
   return (
-    // ✅ FULL SCREEN
     <div className="fullscreen-panel">
+
+      {/* ===== HEADER ===== */}
       <div className="fullscreen-header">
         <div className="fullscreen-header-left">
           <h2>📋 Panel de Pedidos</h2>
+          <span className="panel-user">
+            👤 {user?.name} | {user?.role}
+          </span>
         </div>
 
         <div className="fullscreen-header-actions">
-          <button className="export-btn">
+          <button className="export-btn" onClick={handleExport}>
             📊 Exportar Informe CSV
           </button>
-
-          <button className="store-btn" onClick={onGoStore}>
+          <button className="store-btn" onClick={onClose}>
             🏪 Ir a la Tienda
           </button>
-
+          <button
+            className="logout-btn-panel"
+            onClick={onSignOut}
+          >
+            🚪 Cerrar Sesión
+          </button>
           <button
             className="close-fullscreen-btn"
             onClick={onClose}
-            title="Cerrar panel"
+            title="Cerrar panel (ESC)"
           >
             ✕
           </button>
         </div>
       </div>
-      
-      {/* STATS */}
+
+      {/* ===== STATS ===== */}
       <div className="order-stats">
         <div className="stat-box">
           <strong>{orders.length}</strong>
@@ -102,7 +117,7 @@ export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
         </div>
       </div>
 
-      {/* FILTROS */}
+      {/* ===== FILTROS ===== */}
       <div className="order-filters">
         {['all', 'pending', 'paid', 'shipped', 'cancelled'].map(f => (
           <button
@@ -115,7 +130,7 @@ export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
         ))}
       </div>
 
-      {/* CONTENT */}
+      {/* ===== CONTENT ===== */}
       <div className="fullscreen-content">
         <div className="orders-list">
 
@@ -125,7 +140,7 @@ export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
               <span>
                 {filter !== 'all'
                   ? `con estado "${STATUS[filter]?.label}"`
-                  : 'aún. Los pedidos aparecerán aquí.'
+                  : 'aún. Los pedidos aparecerán aquí cuando un cliente haga una compra.'
                 }
               </span>
             </div>
@@ -167,7 +182,7 @@ export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
                   <div className="order-items">
                     {order.items?.map(item => (
                       <div key={item.id} className="order-item-row">
-                        <span>{item.name} x{item.quantity}</span>
+                        <span>{item.name} × {item.quantity}</span>
                         <span>
                           ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
                         </span>
@@ -210,9 +225,7 @@ export const OrderPanel = ({ isOpen, onClose, onGoStore }) => {
                       >
                         ✅ Marcar Pagado
                       </button>
-                      {(user?.role === 'GERENTE' ||
-                        user?.role === 'ADMIN' ||
-                        user?.role === 'SUPERUSER') && (
+                      {canCancel && (
                         <button
                           className="btn-cancel-order"
                           onClick={() => {

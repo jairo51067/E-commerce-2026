@@ -6,7 +6,14 @@ import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Exporter } from '@infrastructure/utils/exporter.js';
 
 const EMPTY_PRODUCT = {
-  name: '', price: '', stock: '', image: '', category: 'electronics'
+  name: '',
+  price: '',
+  originalPrice: '',
+  stock: '',
+  image: '',
+  category: 'electronics',
+  isNew: false,
+  isOffer: false
 };
 
 const CATEGORIES = [
@@ -17,11 +24,10 @@ const CATEGORIES = [
   { value: 'other',        label: '📦 Otros' }
 ];
 
-export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
-  if (!isOpen) return null;
-
+export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
   const { user } = useAuth();
   const { products, addProduct, editProduct, deleteProduct } = useStore();
+
   const [view, setView] = useState('list');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [form, setForm] = useState(EMPTY_PRODUCT);
@@ -35,7 +41,12 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
 
   const handleEdit = (product) => {
     setSelectedProduct(product);
-    setForm({ ...product });
+    setForm({
+      ...product,
+      originalPrice: product.originalPrice || '',
+      isNew: product.isNew || false,
+      isOffer: product.isOffer || false
+    });
     setView('edit');
   };
 
@@ -55,6 +66,7 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
     const productData = {
       ...form,
       price: parseFloat(form.price),
+      originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
       stock: parseInt(form.stock),
       id: view === 'edit' ? selectedProduct.id : `prod_${Date.now()}`
     };
@@ -80,35 +92,48 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
     }
   };
 
+  const handleCancel = () => {
+    setView('list');
+    setForm(EMPTY_PRODUCT);
+    setSelectedProduct(null);
+  };
+
   return (
-    // ✅ FULL SCREEN
     <div className="fullscreen-panel">
+
+      {/* ===== HEADER ===== */}
       <div className="fullscreen-header">
         <div className="fullscreen-header-left">
           <h2>⚙️ Panel Administrador</h2>
+          <span className="panel-user">
+            👤 {user?.name} | {user?.role}
+          </span>
         </div>
 
         <div className="fullscreen-header-actions">
-          <button className="export-btn">
+          <button className="export-btn" onClick={handleExport}>
             📊 Exportar Informe CSV
           </button>
-
-          <button className="store-btn" onClick={onGoStore}>
+          <button className="store-btn" onClick={onClose}>
             🏪 Ir a la Tienda
           </button>
-
+          <button
+            className="logout-btn-panel"
+            onClick={onSignOut}
+          >
+            🚪 Cerrar Sesión
+          </button>
           <button
             className="close-fullscreen-btn"
             onClick={onClose}
-            title="Cerrar panel"
+            title="Cerrar panel (ESC)"
           >
             ✕
           </button>
         </div>
       </div>
 
-    
-      {/* STATS */}
+      {/* ===== STATS ===== */}
       <div className="admin-stats">
         <div className="stat-box">
           <strong>{products.length}</strong>
@@ -123,14 +148,18 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
           <span>Sin Stock</span>
         </div>
         <div className="stat-box">
+          <strong>{products.filter(p => p.isOffer).length}</strong>
+          <span>En Oferta</span>
+        </div>
+        <div className="stat-box">
           <strong>
             ${products.reduce((s, p) => s + (p.price * p.stock), 0).toFixed(0)}
           </strong>
-          <span>Valor Inventario</span>
+          <span>Inventario</span>
         </div>
       </div>
 
-      {/* TABS */}
+      {/* ===== TABS ===== */}
       <div className="panel-tabs">
         <button
           className={`tab ${view === 'list' ? 'active' : ''}`}
@@ -146,7 +175,7 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
         </button>
       </div>
 
-      {/* CONTENT */}
+      {/* ===== CONTENT ===== */}
       <div className="fullscreen-content">
 
         {/* LISTA */}
@@ -160,36 +189,53 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
             />
 
             <div className="products-admin-grid">
-              {filteredProducts.map(product => (
-                <div key={product.id} className="product-row">
-                  <img
-                    src={product.image || 'https://via.placeholder.com/60'}
-                    alt={product.name}
-                  />
-                  <div className="product-row-info">
-                    <strong>{product.name}</strong>
-                    <span>
-                      💰 ${product.price} |
-                      📦 Stock: {product.stock} |
-                      🏷️ {product.category}
-                    </span>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map(product => (
+                  <div key={product.id} className="product-row">
+                    <img
+                      src={product.image || 'https://placehold.co/60'}
+                      alt={product.name}
+                      onError={e => {
+                        e.target.src = 'https://placehold.co/60';
+                      }}
+                    />
+                    <div className="product-row-info">
+                      <strong>{product.name}</strong>
+                      <span>
+                        💰 ${product.price}
+                        {product.originalPrice && (
+                          <> <s>${product.originalPrice}</s></>
+                        )}
+                        {' | '}
+                        📦 {product.stock}
+                        {' | '}
+                        🏷️ {product.category}
+                        {product.isNew && ' | ✨ NUEVO'}
+                        {product.isOffer && ' | 🔥 OFERTA'}
+                      </span>
+                    </div>
+                    <div className="product-row-actions">
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(product)}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(product.id)}
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
-                  <div className="product-row-actions">
-                    <button
-                      className="btn-edit"
-                      onClick={() => handleEdit(product)}
-                    >
-                      ✏️ Editar
-                    </button>
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDelete(product.id)}
-                    >
-                      🗑️
-                    </button>
-                  </div>
+                ))
+              ) : (
+                <div className="empty-orders">
+                  <p>📭 No hay productos</p>
+                  <span>Agrega tu primer producto</span>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}
@@ -215,6 +261,12 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
               />
               <input
                 type="number"
+                placeholder="Precio original (opcional)"
+                value={form.originalPrice}
+                onChange={e => setForm({...form, originalPrice: e.target.value})}
+              />
+              <input
+                type="number"
                 placeholder="Stock disponible *"
                 value={form.stock}
                 onChange={e => setForm({...form, stock: e.target.value})}
@@ -229,17 +281,42 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
                   </option>
                 ))}
               </select>
+              <input
+                placeholder="🖼️ URL de imagen"
+                value={form.image}
+                onChange={e => setForm({...form, image: e.target.value})}
+              />
             </div>
 
-            <input
-              placeholder="🖼️ URL de imagen"
-              value={form.image}
-              onChange={e => setForm({...form, image: e.target.value})}
-            />
+            {/* Checkboxes Badges */}
+            <div className="form-checkboxes">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={form.isNew}
+                  onChange={e => setForm({...form, isNew: e.target.checked})}
+                />
+                <span>✨ Marcar como NUEVO</span>
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={form.isOffer}
+                  onChange={e => setForm({...form, isOffer: e.target.checked})}
+                />
+                <span>🔥 Marcar como OFERTA</span>
+              </label>
+            </div>
 
             {form.image && (
               <div className="image-preview">
-                <img src={form.image} alt="Preview" />
+                <img
+                  src={form.image}
+                  alt="Preview"
+                  onError={e => {
+                    e.target.src = 'https://placehold.co/100?text=Error';
+                  }}
+                />
                 <span>Preview imagen</span>
               </div>
             )}
@@ -247,7 +324,7 @@ export const AdminPanel = ({ isOpen, onClose, onGoStore }) => {
             <div className="form-actions">
               <button
                 className="btn-cancel"
-                onClick={() => setView('list')}
+                onClick={handleCancel}
               >
                 ✕ Cancelar
               </button>
