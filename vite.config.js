@@ -1,10 +1,8 @@
-// vite.config.js - REEMPLAZAR COMPLETO
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  base: '/E-commerce-2026/', // 👈 Agrega esto justo aquí
   plugins: [react()],
 
   resolve: {
@@ -12,12 +10,18 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@app': path.resolve(__dirname, './src/app'),
       '@config': path.resolve(__dirname, './src/config'),
-      '@application': path.resolve(__dirname, './src/application'),  // ✅ NUEVO
+      '@application': path.resolve(__dirname, './src/application'),
       '@presentation': path.resolve(__dirname, './src/presentation'),
       '@infrastructure': path.resolve(__dirname, './src/infrastructure'),
       '@domain': path.resolve(__dirname, './src/domain'),
       '@styles': path.resolve(__dirname, './src/styles'),
     }
+  },
+
+  server: {
+    port: 3000,
+    strictPort: false,  // ✅ Si 3000 ocupado, usa otro
+    open: true          // ✅ Abre browser automático
   },
 
   build: {
@@ -29,7 +33,6 @@ export default defineConfig({
         }
       }
     },
-    minify: 'terser',
     sourcemap: false,
     chunkSizeWarningLimit: 600
   }
