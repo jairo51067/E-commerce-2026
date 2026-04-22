@@ -253,3 +253,82 @@
   border-top: 1px solid rgba(255,255,255,0.1);
   margin-top: auto;
 }
+
+/* ===== HERO REBRANDED ===== */
+.hero {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem 1rem;
+  color: white;
+  position: relative;
+}
+
+.hero-logo {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  animation: logoFloat 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+.hero h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.hero p {
+  font-size: 1rem;
+  opacity: 0.95;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ===== FOOTER - POWERED BY ===== */
+.app-footer {
+  background: rgba(0,0,0,0.2);
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.82rem;
+  backdrop-filter: blur(10px);
+}
+
+.app-footer p {
+  margin: 0.2rem 0;
+}
+
+.app-footer .powered-by {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  margin-top: 0.4rem;
+}
+
+.app-footer .powered-by strong {
+  color: white;
+  font-weight: 700;
+}
+
+/* ===== RESPONSIVE HERO ===== */
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem 1.5rem 1rem;
+  }
+
+  .hero-logo {
+    font-size: 2.8rem;
+  }
+
+  .hero h2 {
+    font-size: 1.7rem;
+  }
+
+  .hero p {
+    font-size: 0.88rem;
+  }
+}

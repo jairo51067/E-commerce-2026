@@ -35,7 +35,7 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
         Notifier.success('✅ Compartido exitosamente');
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        Notifier.success('📋 Link copiado al portapapeles');
+        Notifier.success('📋 Link copiado');
       }
     } catch (error) {
       if (error.name !== 'AbortError') {
@@ -49,7 +49,6 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
     window.open(`https://wa.me/${STORE_CONFIG.whatsapp}?text=${message}`, '_blank');
   };
 
-  // Genera URL QR con API pública
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(window.location.href)}`;
 
   return (
@@ -68,7 +67,7 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
             {user ? '👤' : '👋'}
           </div>
           <div className="profile-header-info">
-            <h2>{user ? user.name : '¡Bienvenido!'}</h2>
+            <h2>{user ? user.name : '¡Hola, bienvenido!'}</h2>
             <p>{user ? user.email : 'Explora nuestra tienda'}</p>
           </div>
           <button className="profile-close-btn" onClick={handleClose}>
@@ -76,25 +75,23 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
           </button>
         </div>
 
-        {/* QR MODAL */}
         {showQR && (
           <div className="qr-section">
             <div className="qr-wrapper">
               <img src={qrUrl} alt="QR Code" />
             </div>
             <p className="qr-info">
-              📱 Escanea este código QR para compartir la tienda
+              📱 Comparte la tienda escaneando este código
             </p>
             <button
               className="qr-close-btn"
               onClick={() => setShowQR(false)}
             >
-              Volver
+              ← Volver
             </button>
           </div>
         )}
 
-        {/* LISTA OPCIONES */}
         {!showQR && (
           <div className="profile-list">
 
@@ -108,7 +105,7 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
               >
                 <span className="profile-item-icon">📱</span>
                 <div className="profile-item-content">
-                  <strong>Código QR de la tienda</strong>
+                  <strong>Código QR</strong>
                   <span>Comparte con tus clientes</span>
                 </div>
                 <span className="profile-item-arrow">→</span>
@@ -121,7 +118,7 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
                 <span className="profile-item-icon">📤</span>
                 <div className="profile-item-content">
                   <strong>Compartir tienda</strong>
-                  <span>WhatsApp, redes sociales...</span>
+                  <span>WhatsApp, redes, etc.</span>
                 </div>
                 <span className="profile-item-arrow">→</span>
               </button>
@@ -139,14 +136,14 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
               </button>
             </div>
 
-            {/* SECCIÓN INFO */}
+            {/* INFORMACIÓN TIENDA */}
             <div className="profile-section">
               <div className="profile-section-title">ℹ️ INFORMACIÓN</div>
 
               <div className="profile-item info-item">
                 <span className="profile-item-icon">🕐</span>
                 <div className="profile-item-content">
-                  <strong>Horario de atención</strong>
+                  <strong>Horario</strong>
                   <span>{STORE_CONFIG.schedule}</span>
                 </div>
               </div>
@@ -168,25 +165,41 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
               </div>
             </div>
 
-            {/* SECCIÓN APP */}
+            {/* APLICACIÓN - REBRANDED CON VENDEYA */}
             <div className="profile-section">
               <div className="profile-section-title">📱 APLICACIÓN</div>
 
               <div className="profile-item info-item">
-                <span className="profile-item-icon">🎯</span>
+                <span className="profile-item-icon">
+                  {STORE_CONFIG.platform.logo}
+                </span>
                 <div className="profile-item-content">
-                  <strong>Versión de la app</strong>
-                  <span>1.0.0 • Build 2026</span>
+                  <strong>{STORE_CONFIG.platform.name}</strong>
+                  <span>v{STORE_CONFIG.platform.version} • Build {STORE_CONFIG.platform.build}</span>
                 </div>
               </div>
 
               <div className="profile-item info-item">
-                <span className="profile-item-icon">⚡</span>
+                <span className="profile-item-icon">🎯</span>
                 <div className="profile-item-content">
-                  <strong>Sobre nosotros</strong>
-                  <span>{STORE_CONFIG.description}</span>
+                  <strong>Nuestra plataforma</strong>
+                  <span>{STORE_CONFIG.platform.slogan}</span>
                 </div>
               </div>
+
+              <a
+                className="profile-item"
+                href={STORE_CONFIG.platform.website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="profile-item-icon">🌐</span>
+                <div className="profile-item-content">
+                  <strong>¿Quieres tu tienda?</strong>
+                  <span>vendeya.app</span>
+                </div>
+                <span className="profile-item-arrow">→</span>
+              </a>
             </div>
 
             {/* SESIÓN */}
@@ -201,8 +214,6 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
                 🚪 Cerrar sesión
               </button>
             ) : (
-              /* Aquí comentamos el botón de iniciar sesión - esta es la foma de comtarlo*/
-              /*
               <button
                 className="profile-login-btn"
                 onClick={() => {
@@ -212,16 +223,15 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
               >
                 🔐 Iniciar sesión
               </button>
-              */
-              null // Ponemos null porque React necesita que el bloque retorne algo El null: 
-              //Como estás dentro de un operador ternario (condicion ? casoA : casoB), React espera que si no hay un botón en el "caso B", devuelvas algo. Al poner null, le dices que no renderice nada en absoluto.
             )}
 
             {/* FOOTER */}
             <p className="profile-footer">
               © 2026 {STORE_CONFIG.name}
               <br />
-              <span>Hecho con ❤️ en Venezuela</span>
+              <span>
+                Potenciado por {STORE_CONFIG.platform.logo} <strong>{STORE_CONFIG.platform.name}</strong>
+              </span>
             </p>
           </div>
         )}

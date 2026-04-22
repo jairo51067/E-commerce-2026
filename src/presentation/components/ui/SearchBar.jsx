@@ -19,13 +19,12 @@ export const SearchBar = ({ onSearch, onClose }) => {
             onChange={e => setQuery(e.target.value)}
             autoFocus
           />
-          {query && (
+          {searchQuery && (
             <button
               className="search-clear"
-              onClick={() => setQuery('')}
-            >
-              ✕
-            </button>
+              onClick={() => setSearchQuery('')}
+              aria-label="Limpiar búsqueda"
+            />
           )}
         </div>
 

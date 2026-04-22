@@ -24,18 +24,18 @@ function App() {
   const { user, signOut } = useAuth();
   const { products } = useStore();
 
-  const [showWelcome,  setShowWelcome]  = useState(true);
-  const [showLogin,    setShowLogin]    = useState(false);
-  const [showCart,     setShowCart]     = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showCart, setShowCart] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
-  const [showAdmin,    setShowAdmin]    = useState(false);
-  const [showOrders,   setShowOrders]   = useState(false);
-  const [showSearch,   setShowSearch]   = useState(false);
-  const [showProfile,  setShowProfile]  = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
-  const [searchQuery,    setSearchQuery]    = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
-  const [activeTab,      setActiveTab]      = useState('home');
+  const [activeTab, setActiveTab] = useState('home');
 
   const isInternalUser = user && (
     user.role === 'ADMIN' ||
@@ -202,7 +202,8 @@ function App() {
       {!isPanelOpen && (
         <main className="app-main">
           <div className="hero">
-            <h2>📦 {STORE_CONFIG.name}</h2>
+            <div className="hero-logo">{STORE_CONFIG.logo}</div>
+            <h2>{STORE_CONFIG.name}</h2>
             <p>{STORE_CONFIG.tagline}</p>
           </div>
 
@@ -230,11 +231,12 @@ function App() {
           </div>
 
           {searchQuery && (
-            <p className="search-results">
-              🔍 {filteredProducts.length} resultado(s) para
-              " <strong>{searchQuery}</strong> "
-            </p>
-          )}
+  <button
+    className="search-clear"
+    onClick={() => setSearchQuery('')}
+    aria-label="Limpiar búsqueda"
+  />
+)}
 
           <div className="products-grid">
             {filteredProducts.length > 0 ? (
@@ -262,7 +264,12 @@ function App() {
 
       {!isPanelOpen && (
         <footer className="app-footer">
-          <p>© 2026 {STORE_CONFIG.name} | {STORE_CONFIG.location}</p>
+          <p>
+            © 2026 {STORE_CONFIG.name} | {STORE_CONFIG.location}
+          </p>
+          <p className="powered-by">
+            Potenciado por {STORE_CONFIG.platform.logo} <strong>{STORE_CONFIG.platform.name}</strong>
+          </p>
         </footer>
       )}
 

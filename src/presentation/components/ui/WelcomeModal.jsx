@@ -6,35 +6,32 @@ export const WelcomeModal = ({ onClose }) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Animación entrada
     setTimeout(() => setVisible(true), 100);
   }, []);
 
   const handleClose = () => {
     setVisible(false);
-    setTimeout(onClose, 400);
+    setTimeout(onClose, 300);
   };
 
   return (
-    <div className={`welcome-overlay ${visible ? 'visible' : ''}`}>
-      <div className={`welcome-modal ${visible ? 'visible' : ''}`}>
+    <div
+      className={`welcome-overlay ${visible ? 'visible' : ''}`}
+      onClick={handleClose}
+    >
+      <div
+        className={`welcome-modal ${visible ? 'visible' : ''}`}
+        onClick={e => e.stopPropagation()}
+      >
 
-        {/* FONDO DECORATIVO */}
-        <div className="welcome-bg">
-          <div className="welcome-circle c1" />
-          <div className="welcome-circle c2" />
-          <div className="welcome-circle c3" />
-        </div>
-
-        {/* CONTENIDO */}
-        <div className="welcome-content">
-
-          {/* LOGO */}
-          <div className="welcome-logo">
-            <span>{STORE_CONFIG.logo}</span>
+        {/* HEADER VISUAL */}
+        <div className="welcome-header">
+          <div className="welcome-logo-container">
+            <div className="welcome-logo-icon">
+              {STORE_CONFIG.logo}
+            </div>
           </div>
 
-          {/* NOMBRE TIENDA */}
           <h1 className="welcome-title">
             {STORE_CONFIG.name}
           </h1>
@@ -43,45 +40,52 @@ export const WelcomeModal = ({ onClose }) => {
             {STORE_CONFIG.tagline}
           </p>
 
-          {/* DIVIDER */}
-          <div className="welcome-divider" />
+          <div className="welcome-badge">
+            ✨ {STORE_CONFIG.description}
+          </div>
+        </div>
 
-          {/* INFO */}
-          <div className="welcome-info">
-            <div className="welcome-info-item">
-              <span>🕐</span>
-              <span>{STORE_CONFIG.schedule}</span>
-            </div>
-            <div className="welcome-info-item">
-              <span>📍</span>
-              <span>{STORE_CONFIG.location}</span>
-            </div>
-            <div className="welcome-info-item">
-              <span>📱</span>
-              <span>+{STORE_CONFIG.whatsapp}</span>
+        {/* FEATURES */}
+        <div className="welcome-features">
+          <div className="welcome-feature">
+            <span className="feature-icon">🚚</span>
+            <div>
+              <strong>Delivery Rápido</strong>
+              <span>Entrega en tu zona</span>
             </div>
           </div>
 
-          {/* REDES */}
-          <div className="welcome-social">
-            <span>🌐 {STORE_CONFIG.social.instagram}</span>
-            <span>🌐 {STORE_CONFIG.social.facebook}</span>
-            <a href={`https://twitter.com/${STORE_CONFIG.social.twitter}`} target="_blank" rel="noopener noreferrer">
-              <span>🌐 {STORE_CONFIG.social.twitter}</span>
-            </a>
+          <div className="welcome-feature">
+            <span className="feature-icon">💳</span>
+            <div>
+              <strong>Múltiples Pagos</strong>
+              <span>Efectivo, móvil, transfer</span>
+            </div>
           </div>
 
-          {/* BOTÓN */}
-          <button
-            className="welcome-btn"
-            onClick={handleClose}
-          >
-            🛍️ Ver Catálogo
-          </button>
+          <div className="welcome-feature">
+            <span className="feature-icon">💬</span>
+            <div>
+              <strong>Atención WhatsApp</strong>
+              <span>Respuesta inmediata</span>
+            </div>
+          </div>
+        </div>
 
-          <p className="welcome-footer">
-            {STORE_CONFIG.description}
-          </p>
+        {/* CTA */}
+        <button
+          className="welcome-cta"
+          onClick={handleClose}
+        >
+          🛍️ Explorar productos
+        </button>
+
+        {/* FOOTER - POWERED BY VENDEYA */}
+        <div className="welcome-footer">
+          <span>Powered by</span>
+          <strong>
+            {STORE_CONFIG.platform.logo} {STORE_CONFIG.platform.name}
+          </strong>
         </div>
 
       </div>
