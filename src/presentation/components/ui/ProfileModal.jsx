@@ -201,6 +201,8 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
                 🚪 Cerrar sesión
               </button>
             ) : (
+              /* Aquí comentamos el botón de iniciar sesión - esta es la foma de comtarlo*/ 
+              /*
               <button
                 className="profile-login-btn"
                 onClick={() => {
@@ -210,6 +212,8 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
               >
                 🔐 Iniciar sesión
               </button>
+              */
+             null // Ponemos null porque React necesita que el bloque retorne algo
             )}
 
             {/* FOOTER */}
