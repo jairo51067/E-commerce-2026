@@ -41,8 +41,8 @@ export const STORE_CONFIG = {
   // ═══════════════════════════════════════════
   // 📞 CONTACTO
   // ═══════════════════════════════════════════
-  whatsapp:    '5804245231898',
-  email:       'ventas@mitienda.com',
+  whatsapp:    '5804127055024',
+  email:       'jairo.cardenas.dev@gmail.com',
 
   // ═══════════════════════════════════════════
   // 💰 CONFIGURACIÓN COMERCIAL
