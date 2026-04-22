@@ -17,16 +17,16 @@ export const OrderSuccessModal = ({ order, onClose }) => {
     window.open(order.whatsappUrl, '_blank');
   };
 
+  const hasSavings = order.savings && order.savings > 0;
+
   return (
     <div className={`success-overlay ${visible ? 'visible' : ''}`}>
       <div className={`success-modal ${visible ? 'visible' : ''}`}>
 
-        {/* ICONO ANIMADO */}
         <div className="success-icon-wrap">
           <div className="success-icon">✓</div>
         </div>
 
-        {/* TÍTULO */}
         <h1 className="success-title">
           ¡Pedido Exitoso!
         </h1>
@@ -35,19 +35,23 @@ export const OrderSuccessModal = ({ order, onClose }) => {
           Gracias por tu compra, {order.customerName}
         </p>
 
-        {/* NÚMERO DE ORDEN */}
+        {/* ✅ BADGE AHORRO */}
+        {hasSavings && (
+          <div className="success-savings-badge">
+            🎉 ¡Ahorraste <strong>${order.savings.toFixed(2)}</strong>!
+          </div>
+        )}
+
         <div className="success-order-id">
           <span>Número de orden</span>
           <strong>#{order.id}</strong>
         </div>
 
-        {/* TOTAL */}
         <div className="success-total">
           <span>Total pagado</span>
           <strong>${order.total.toFixed(2)}</strong>
         </div>
 
-        {/* INFO */}
         <div className="success-info">
           <div className="success-info-item">
             <span>📱</span>
@@ -72,8 +76,7 @@ export const OrderSuccessModal = ({ order, onClose }) => {
           </div>
         </div>
 
-        {/* BOTONES */}
-        <div className="success-actions">
+                <div className="success-actions">
           <button
             className="success-btn-whatsapp"
             onClick={handleReopenWhatsApp}

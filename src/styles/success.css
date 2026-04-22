@@ -237,3 +237,28 @@
     font-size: 1.3rem;
   }
 }
+
+/* ===== SUCCESS SAVINGS BADGE ===== */
+.success-savings-badge {
+  background: linear-gradient(135deg, #fff9e6, #ffe4a8);
+  border: 2px dashed #ffc107;
+  color: #8b6914;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  animation: savingsBounce 0.8s ease;
+}
+
+.success-savings-badge strong {
+  color: #b8860b;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+@keyframes savingsBounce {
+  0%   { transform: scale(0.5); opacity: 0; }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}

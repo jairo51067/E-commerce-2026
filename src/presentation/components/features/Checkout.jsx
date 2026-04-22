@@ -1,6 +1,7 @@
 // src/presentation/components/features/Checkout.jsx
 import React, { useState } from 'react';
 import { useCart } from '@presentation/hooks/useCart.js';
+import { useStore } from '@presentation/store/index.js';
 import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Validators } from '@infrastructure/utils/validators.js';
 import { STORE_CONFIG } from '@config/store.config.js';
@@ -8,6 +9,7 @@ import { OrderSuccessModal } from '@presentation/components/ui/OrderSuccessModal
 
 export const Checkout = ({ isOpen, onClose }) => {
   const { cart, cartTotal, clearCart, addOrder } = useCart();
+  const { products } = useStore();
 
   const [form, setForm] = useState({
     name: '',
@@ -28,6 +30,21 @@ export const Checkout = ({ isOpen, onClose }) => {
 
   const finalTotal = cartTotal + deliveryCost;
 
+  // ✅ CALCULAR AHORRO TOTAL
+  const totalSavings = cart.reduce((sum, item) => {
+    const product = products.find(p => p.id === item.id);
+    if (product && product.originalPrice && product.originalPrice > product.price) {
+      const savingPerUnit = product.originalPrice - product.price;
+      return sum + (savingPerUnit * item.quantity);
+    }
+    return sum;
+  }, 0);
+
+  const hasAnyDiscount = totalSavings > 0;
+
+  // ✅ Precio original total (sin descuentos)
+  const originalTotal = cartTotal + totalSavings;
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -47,12 +64,8 @@ export const Checkout = ({ isOpen, onClose }) => {
   };
 
   const handlePhoneChange = (e) => {
-    const value = e.target.value;
-    setForm({ ...form, phone: value });
-
-    if (errors.phone) {
-      setErrors({ ...errors, phone: null });
-    }
+    setForm({ ...form, phone: e.target.value });
+    if (errors.phone) setErrors({ ...errors, phone: null });
   };
 
   const handleSubmit = async () => {
@@ -85,24 +98,44 @@ export const Checkout = ({ isOpen, onClose }) => {
         })),
         subtotal: Number(cartTotal.toFixed(2)),
         deliveryCost: Number(deliveryCost.toFixed(2)),
+        savings: Number(totalSavings.toFixed(2)),
         total: Number(finalTotal.toFixed(2)),
         status: 'pending',
         createdAt: new Date().toISOString()
       };
 
-      // ✅ Crear pedido (descuenta stock automáticamente)
       addOrder(order);
 
-      // ✅ Construir mensaje WhatsApp
+      // ✅ Mensaje WhatsApp CON AHORRO
       const itemsText = cart
-        .map(item =>
-          `• ${item.name}\n   ${item.quantity} × $${Number(item.price).toFixed(2)} = $${(item.price * item.quantity).toFixed(2)}`
-        )
+        .map(item => {
+          const product = products.find(p => p.id === item.id);
+          const hasDiscount = product?.originalPrice && product.originalPrice > product.price;
+
+          let itemLine = `• ${item.name}\n   ${item.quantity} × $${Number(item.price).toFixed(2)}`;
+
+          if (hasDiscount) {
+            itemLine += ` ~~$${product.originalPrice.toFixed(2)}~~`;
+          }
+
+          itemLine += ` = $${(item.price * item.quantity).toFixed(2)}`;
+
+          if (hasDiscount) {
+            const itemSaving = (product.originalPrice - product.price) * item.quantity;
+            itemLine += `\n   💰 Ahorras $${itemSaving.toFixed(2)}`;
+          }
+
+          return itemLine;
+        })
         .join('\n\n');
 
       const deliveryText = form.deliveryType === 'delivery'
         ? `🚚 *DELIVERY*\n📍 ${form.address}\n💰 Costo delivery: $${deliveryCost.toFixed(2)}`
         : '🏪 *RETIRO EN TIENDA*';
+
+      const savingsText = hasAnyDiscount
+        ? `\n🎉 *¡TÚ AHORRASTE $${totalSavings.toFixed(2)}!*\n`
+        : '';
 
       const message = `🛒 *NUEVO PEDIDO #${orderId}*
 ━━━━━━━━━━━━━━━━━━━
@@ -116,10 +149,10 @@ ${deliveryText}
 📦 *PRODUCTOS:*
 
 ${itemsText}
-
+${savingsText}
 ━━━━━━━━━━━━━━━━━━━
 💰 *RESUMEN:*
-Subtotal: $${cartTotal.toFixed(2)}
+${hasAnyDiscount ? `Precio original: ~~$${originalTotal.toFixed(2)}~~\n` : ''}Subtotal: $${cartTotal.toFixed(2)}
 ${deliveryCost > 0 ? `Delivery: $${deliveryCost.toFixed(2)}\n` : ''}*TOTAL: $${finalTotal.toFixed(2)}*
 
 ━━━━━━━━━━━━━━━━━━━
@@ -130,18 +163,16 @@ _Pedido generado desde la app_ 📱`;
 
       const whatsappUrl = `https://wa.me/${STORE_CONFIG.whatsapp}?text=${encodeURIComponent(message)}`;
 
-      // ✅ Guardar datos para modal éxito
       setSuccessOrder({
         id: orderId,
         total: finalTotal,
+        savings: totalSavings,
         whatsappUrl,
         customerName: form.name
       });
 
-      // ✅ Abrir WhatsApp
       window.open(whatsappUrl, '_blank');
 
-      // ✅ Limpiar
       clearCart();
       setForm({ name: '', phone: '', address: '', deliveryType: 'pickup' });
       setErrors({});
@@ -161,7 +192,6 @@ _Pedido generado desde la app_ 📱`;
     onClose();
   };
 
-  // ✅ Si hay pedido exitoso → mostrar modal
   if (successOrder) {
     return (
       <OrderSuccessModal
@@ -181,24 +211,75 @@ _Pedido generado desde la app_ 📱`;
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
+        {/* 🎉 BANNER AHORRO */}
+        {hasAnyDiscount && (
+          <div className="savings-banner">
+            <span className="savings-icon">🎉</span>
+            <div className="savings-content">
+              <strong>¡Genial! Estás ahorrando</strong>
+              <span className="savings-amount">${totalSavings.toFixed(2)}</span>
+            </div>
+            <span className="savings-badge">
+              -{Math.round((totalSavings / originalTotal) * 100)}%
+            </span>
+          </div>
+        )}
+
         {/* RESUMEN PEDIDO */}
         <div className="order-summary">
           <h3>📋 Tu Pedido ({cart.length} productos)</h3>
-          {cart.map(item => (
-            <div key={item.id} className="summary-item">
-              <span>{item.name} × {item.quantity}</span>
-              <span>${(item.price * item.quantity).toFixed(2)}</span>
-            </div>
-          ))}
+
+          {cart.map(item => {
+            const product = products.find(p => p.id === item.id);
+            const hasDiscount = product?.originalPrice && product.originalPrice > product.price;
+            const itemSaving = hasDiscount
+              ? (product.originalPrice - product.price) * item.quantity
+              : 0;
+
+            return (
+              <div key={item.id} className="summary-item-wrap">
+                <div className="summary-item">
+                  <span>{item.name} × {item.quantity}</span>
+                  <div className="summary-prices">
+                    {hasDiscount && (
+                      <span className="summary-price-original">
+                        ${(product.originalPrice * item.quantity).toFixed(2)}
+                      </span>
+                    )}
+                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                </div>
+                {hasDiscount && (
+                  <p className="item-saving">
+                    💰 Ahorras ${itemSaving.toFixed(2)}
+                  </p>
+                )}
+              </div>
+            );
+          })}
 
           <div className="summary-divider"></div>
+
+          {hasAnyDiscount && (
+            <div className="summary-item summary-original">
+              <span>Precio original:</span>
+              <span className="line-through">${originalTotal.toFixed(2)}</span>
+            </div>
+          )}
 
           <div className="summary-item">
             <span>Subtotal:</span>
             <span>${cartTotal.toFixed(2)}</span>
           </div>
 
-          {deliveryCost > 0 && (
+          {hasAnyDiscount && (
+            <div className="summary-item summary-savings">
+              <span>🎉 Descuento aplicado:</span>
+              <span>-${totalSavings.toFixed(2)}</span>
+            </div>
+          )}
+
+                    {deliveryCost > 0 && (
             <div className="summary-item">
               <span className="delivery-cost">🚚 Delivery:</span>
               <span className="delivery-cost">+${deliveryCost.toFixed(2)}</span>
@@ -211,6 +292,12 @@ _Pedido generado desde la app_ 📱`;
               ${finalTotal.toFixed(2)}
             </strong>
           </div>
+
+          {hasAnyDiscount && (
+            <p className="total-savings-msg">
+              ✨ Estás ahorrando <strong>${totalSavings.toFixed(2)}</strong> en esta compra
+            </p>
+          )}
         </div>
 
         {/* DATOS CLIENTE */}
@@ -288,7 +375,7 @@ _Pedido generado desde la app_ 📱`;
           </div>
         </div>
 
-        {/* DIRECCIÓN (solo si delivery) */}
+        {/* DIRECCIÓN */}
         {form.deliveryType === 'delivery' && (
           <div className="form-section">
             <h4>📍 Dirección de Entrega</h4>
@@ -321,6 +408,7 @@ _Pedido generado desde la app_ 📱`;
             💡 Coordinaremos el pago por WhatsApp
           </p>
         </div>
+
         {/* BOTÓN WHATSAPP */}
         <button
           className="whatsapp-btn"

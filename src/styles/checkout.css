@@ -238,3 +238,160 @@
   margin: -0.25rem 0 0.75rem 0;
   font-style: italic;
 }
+
+/* ===== SAVINGS BANNER ===== */
+.savings-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #34C759, #28A745);
+  color: white;
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  margin: 0 1rem 1rem 1rem;
+  box-shadow: 0 4px 16px rgba(52,199,89,0.3);
+  animation: savingsPulse 2s ease-in-out infinite;
+}
+
+@keyframes savingsPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(52,199,89,0.3);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 6px 24px rgba(52,199,89,0.45);
+  }
+}
+
+.savings-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.savings-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.savings-content strong {
+  font-size: 0.88rem;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.savings-amount {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.savings-badge {
+  background: white;
+  color: #34C759;
+  padding: 0.4rem 0.85rem;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ===== SUMMARY ITEMS CON AHORRO ===== */
+.summary-item-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.summary-prices {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.summary-price-original {
+  font-size: 0.78rem;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.item-saving {
+  font-size: 0.75rem;
+  color: #34C759;
+  font-weight: 600;
+  margin: 0;
+  padding-left: 0;
+  text-align: right;
+}
+
+.summary-original {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.line-through {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.summary-savings {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #0F9D58;
+  font-weight: 700;
+  padding: 0.6rem 0.85rem !important;
+  border-radius: 8px;
+  margin: 0.4rem 0;
+}
+
+.summary-savings span:last-child {
+  color: #0F9D58;
+  font-weight: 800;
+}
+
+/* ===== TOTAL SAVINGS MESSAGE ===== */
+.total-savings-msg {
+  text-align: center;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #fff9e6, #ffe4a8);
+  border-radius: 10px;
+  color: #8b6914;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1.5px dashed #ffc107;
+}
+
+.total-savings-msg strong {
+  color: #b8860b;
+  font-weight: 800;
+}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 480px) {
+  .savings-banner {
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .savings-icon {
+    font-size: 1.6rem;
+  }
+
+  .savings-content strong {
+    font-size: 0.78rem;
+  }
+
+  .savings-amount {
+    font-size: 1.25rem;
+  }
+
+  .savings-badge {
+    font-size: 0.82rem;
+    padding: 0.3rem 0.65rem;
+  }
+}
