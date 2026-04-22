@@ -12,6 +12,7 @@ import { MiniCart } from '@presentation/components/ui/MiniCart.jsx';
 import { CartBadge } from '@presentation/components/ui/CartBadge.jsx';
 import { SearchBar } from '@presentation/components/ui/SearchBar.jsx';
 import { CategoriesBar } from '@presentation/components/ui/CategoriesBar.jsx';
+import { ProfileModal } from '@presentation/components/ui/ProfileModal.jsx';
 import { BottomNav } from '@presentation/components/layout/BottomNav.jsx';
 import { Checkout } from '@presentation/components/features/Checkout.jsx';
 import { AdminPanel } from '@presentation/components/features/AdminPanel.jsx';
@@ -23,7 +24,6 @@ function App() {
   const { user, signOut } = useAuth();
   const { products } = useStore();
 
-  // ✅ ESTADOS
   const [showWelcome,  setShowWelcome]  = useState(true);
   const [showLogin,    setShowLogin]    = useState(false);
   const [showCart,     setShowCart]     = useState(false);
@@ -31,47 +31,49 @@ function App() {
   const [showAdmin,    setShowAdmin]    = useState(false);
   const [showOrders,   setShowOrders]   = useState(false);
   const [showSearch,   setShowSearch]   = useState(false);
+  const [showProfile,  setShowProfile]  = useState(false);
 
   const [searchQuery,    setSearchQuery]    = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTab,      setActiveTab]      = useState('home');
 
-  // ✅ Usuario interno
   const isInternalUser = user && (
     user.role === 'ADMIN' ||
     user.role === 'GERENTE' ||
     user.role === 'SUPERUSER'
   );
 
-  // ✅ Panel abierto
   const isPanelOpen = showAdmin || showOrders;
 
-  // ✅ SECRET LOGIN
   const handleSecretActivate = useCallback(() => {
     setShowLogin(true);
   }, []);
 
   const { handleLogoClick, clickCount } = useSecretLogin(handleSecretActivate);
 
-  // ✅ CERRAR WELCOME al loguearse
   useEffect(() => {
     if (user) setShowWelcome(false);
   }, [user]);
 
-  // ✅ HANDLERS PANELES
+  // ===== HANDLERS =====
   const goToStore = useCallback(() => {
     setShowAdmin(false);
     setShowOrders(false);
     setShowCart(false);
     setShowCheckout(false);
     setShowSearch(false);
+    setShowProfile(false);
     setActiveTab('home');
+    setSearchQuery('');
+    setActiveCategory('all');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const openAdminPanel = useCallback(() => {
     setShowOrders(false);
     setShowCart(false);
     setShowSearch(false);
+    setShowProfile(false);
     setShowAdmin(true);
     setActiveTab('admin');
   }, []);
@@ -80,8 +82,13 @@ function App() {
     setShowAdmin(false);
     setShowCart(false);
     setShowSearch(false);
+    setShowProfile(false);
     setShowOrders(true);
     setActiveTab('orders');
+  }, []);
+
+  const openProfile = useCallback(() => {
+    setShowProfile(true);
   }, []);
 
   const handleSignOut = useCallback(() => {
@@ -89,7 +96,6 @@ function App() {
     goToStore();
   }, [signOut, goToStore]);
 
-  // ✅ ESC para cerrar paneles
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isPanelOpen) {
@@ -100,7 +106,6 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPanelOpen, goToStore]);
 
-  // ✅ FILTRAR PRODUCTOS
   const filteredProducts = products.filter(product => {
     const matchSearch = product.name
       .toLowerCase()
@@ -119,12 +124,10 @@ function App() {
   return (
     <div className="app">
 
-      {/* ===== WELCOME MODAL ===== */}
       {showWelcome && !user && (
         <WelcomeModal onClose={() => setShowWelcome(false)} />
       )}
 
-      {/* ===== SEARCH MOBILE ===== */}
       {showSearch && !isPanelOpen && (
         <SearchBar
           onSearch={setSearchQuery}
@@ -132,7 +135,7 @@ function App() {
         />
       )}
 
-      {/* ===== HEADER (oculto en panel) ===== */}
+      {/* HEADER (oculto en panel) */}
       {!isPanelOpen && (
         <header className="app-header">
           <div className="header-left">
@@ -158,33 +161,20 @@ function App() {
                 <span className={`role-badge ${user.role.toLowerCase()}`}>
                   {user.role}
                 </span>
-
                 {(user.role === 'ADMIN' || user.role === 'SUPERUSER') && (
-                  <button
-                    className="panel-btn admin"
-                    onClick={openAdminPanel}
-                  >
+                  <button className="panel-btn admin" onClick={openAdminPanel}>
                     ⚙️ Admin
                   </button>
                 )}
-
                 {isInternalUser && (
-                  <button
-                    className="panel-btn orders"
-                    onClick={openOrdersPanel}
-                  >
+                  <button className="panel-btn orders" onClick={openOrdersPanel}>
                     📋 Pedidos
                   </button>
                 )}
-
                 {!isInternalUser && (
                   <CartBadge onClick={() => setShowCart(true)} />
                 )}
-
-                <button
-                  className="logout-btn"
-                  onClick={handleSignOut}
-                >
+                <button className="logout-btn" onClick={handleSignOut}>
                   🚪 Salir
                 </button>
               </>
@@ -208,7 +198,7 @@ function App() {
         </header>
       )}
 
-      {/* ===== MAIN (oculto en panel) ===== */}
+      {/* MAIN */}
       {!isPanelOpen && (
         <main className="app-main">
           <div className="hero">
@@ -270,26 +260,25 @@ function App() {
         </main>
       )}
 
-      {/* ===== FOOTER (oculto en panel) ===== */}
       {!isPanelOpen && (
         <footer className="app-footer">
           <p>© 2026 {STORE_CONFIG.name} | {STORE_CONFIG.location}</p>
         </footer>
       )}
 
-      {/* ===== BOTTOM NAV (oculto en panel) ===== */}
-      {!isPanelOpen && (
-        <BottomNav
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          onOpenCart={() => setShowCart(true)}
-          onOpenSearch={() => setShowSearch(true)}
-          onOpenOrders={openOrdersPanel}
-          onOpenAdmin={openAdminPanel}
-        />
-      )}
+      {/* ===== BOTTOM NAV ===== */}
+      <BottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onGoHome={goToStore}
+        onOpenCart={() => setShowCart(true)}
+        onOpenSearch={() => setShowSearch(true)}
+        onOpenOrders={openOrdersPanel}
+        onOpenAdmin={openAdminPanel}
+        onOpenProfile={openProfile}
+      />
 
-      {/* ===== MODALES ===== */}
+      {/* MODALES */}
       <LoginModal
         isOpen={showLogin}
         onClose={() => setShowLogin(false)}
@@ -309,7 +298,14 @@ function App() {
         onClose={() => setShowCheckout(false)}
       />
 
-      {/* ===== PANELES FULLSCREEN ===== */}
+      <ProfileModal
+        isOpen={showProfile}
+        onClose={() => setShowProfile(false)}
+        user={user}
+        onSignOut={handleSignOut}
+        onOpenLogin={() => setShowLogin(true)}
+      />
+
       {showAdmin && (
         <AdminPanel
           isOpen={showAdmin}
@@ -329,4 +325,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; 

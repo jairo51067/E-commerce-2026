@@ -26,7 +26,7 @@ export const BottomNav = ({
   );
 
   return (
-    <nav className="bottom-nav">
+    <nav className="bottom-nav"> 
 
       {/* INICIO - ✅ Ahora funcional */}
       <button

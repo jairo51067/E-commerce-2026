@@ -1,6 +1,7 @@
 // src/presentation/store/index.js - REEMPLAZAR COMPLETO
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { AuditLogger } from '@infrastructure/utils/auditLogger.js';
 
 const INITIAL_PRODUCTS = [
   {
@@ -83,15 +84,31 @@ export const useStore = create(
 
       // ===== AUTH =====
       user: null,
-      login: (userData) => set({ user: userData }),
-      logout: () => set({ user: null }),
+      login: (userData) => {
+        const entry = AuditLogger.createEntry('LOGIN', userData);
+        set(state => ({
+          user: userData,
+          auditLog: [entry, ...state.auditLog]
+        }));
+      },
+      logout: () => {
+        const user = get().user;
+        if (user) {
+          const entry = AuditLogger.createEntry('LOGOUT', user);
+          set(state => ({
+            user: null,
+            auditLog: [entry, ...state.auditLog]
+          }));
+        } else {
+          set({ user: null });
+        }
+      },
 
       // ===== CART =====
       cart: [],
 
       addToCart: (product, quantity = 1) => set((state) => {
         const existing = state.cart.find(item => item.id === product.id);
-
         if (existing) {
           const newQty = existing.quantity + quantity;
           if (newQty <= 0) {
@@ -107,9 +124,7 @@ export const useStore = create(
             )
           };
         }
-
         if (quantity <= 0) return state;
-
         return {
           cart: [...state.cart, {
             id: product.id,
@@ -146,47 +161,44 @@ export const useStore = create(
       // ===== PRODUCTS =====
       products: INITIAL_PRODUCTS,
 
-      addProduct: (product) => set((state) => ({
-        products: [...state.products, product]
-      })),
+      addProduct: (product) => set((state) => {
+        const entry = AuditLogger.createEntry(
+          'PRODUCT_ADDED',
+          state.user,
+          { productId: product.id, productName: product.name, price: product.price }
+        );
+        return {
+          products: [...state.products, product],
+          auditLog: [entry, ...state.auditLog]
+        };
+      }),
 
-      editProduct: (updatedProduct) => set((state) => ({
-        products: state.products.map(p =>
-          p.id === updatedProduct.id ? updatedProduct : p
-        )
-      })),
+      editProduct: (updatedProduct) => set((state) => {
+        const entry = AuditLogger.createEntry(
+          'PRODUCT_EDITED',
+          state.user,
+          { productId: updatedProduct.id, productName: updatedProduct.name }
+        );
+        return {
+          products: state.products.map(p =>
+            p.id === updatedProduct.id ? updatedProduct : p
+          ),
+          auditLog: [entry, ...state.auditLog]
+        };
+      }),
 
-      deleteProduct: (productId) => set((state) => ({
-        products: state.products.filter(p => p.id !== productId)
-      })),
-
-      // ✅ NUEVO: Descontar stock al vender
-      decreaseStock: (items) => set((state) => ({
-        products: state.products.map(product => {
-          const soldItem = items.find(item => item.id === product.id);
-          if (soldItem) {
-            return {
-              ...product,
-              stock: Math.max(0, product.stock - soldItem.quantity)
-            };
-          }
-          return product;
-        })
-      })),
-
-      // ✅ NUEVO: Restaurar stock al cancelar pedido
-      restoreStock: (items) => set((state) => ({
-        products: state.products.map(product => {
-          const item = items.find(i => i.id === product.id);
-          if (item) {
-            return {
-              ...product,
-              stock: product.stock + item.quantity
-            };
-          }
-          return product;
-        })
-      })),
+      deleteProduct: (productId) => set((state) => {
+        const product = state.products.find(p => p.id === productId);
+        const entry = AuditLogger.createEntry(
+          'PRODUCT_DELETED',
+          state.user,
+          { productId, productName: product?.name }
+        );
+        return {
+          products: state.products.filter(p => p.id !== productId),
+          auditLog: [entry, ...state.auditLog]
+        };
+      }),
 
       resetProducts: () => set({ products: INITIAL_PRODUCTS }),
 
@@ -194,7 +206,12 @@ export const useStore = create(
       orders: [],
 
       addOrder: (order) => set((state) => {
-        // ✅ Descontar stock al crear pedido
+        const entry = AuditLogger.createEntry(
+          'ORDER_CREATED',
+          { id: 'client', name: order.customer.name, role: 'CLIENT', email: '' },
+          { orderId: order.id, total: order.total, items: order.items.length }
+        );
+
         const updatedProducts = state.products.map(product => {
           const soldItem = order.items.find(item => item.id === product.id);
           if (soldItem) {
@@ -206,18 +223,45 @@ export const useStore = create(
           return product;
         });
 
+        // ✅ Orden incluye historial de auditoría
+        const orderWithAudit = {
+          ...order,
+          auditHistory: [entry]
+        };
+
         return {
-          orders: [order, ...state.orders],
-          products: updatedProducts
+          orders: [orderWithAudit, ...state.orders],
+          products: updatedProducts,
+          auditLog: [entry, ...state.auditLog]
         };
       }),
 
-      updateOrderStatus: (orderId, status) => set((state) => {
+            updateOrderStatus: (orderId, status) => set((state) => {
         const order = state.orders.find(o => o.id === orderId);
+        if (!order) return state;
 
-        // ✅ Si se cancela pedido → restaurar stock
+        const actionMap = {
+          'paid':      'ORDER_PAID',
+          'shipped':   'ORDER_SHIPPED',
+          'cancelled': 'ORDER_CANCELLED'
+        };
+
+        const action = actionMap[status];
+        const entry = AuditLogger.createEntry(
+          action,
+          state.user,
+          {
+            orderId,
+            previousStatus: order.status,
+            newStatus: status,
+            total: order.total,
+            customer: order.customer?.name
+          }
+        );
+
+        // ✅ Si se cancela → restaurar stock
         let updatedProducts = state.products;
-        if (order && status === 'cancelled' && order.status !== 'cancelled') {
+        if (status === 'cancelled' && order.status !== 'cancelled') {
           updatedProducts = state.products.map(product => {
             const item = order.items.find(i => i.id === product.id);
             if (item) {
@@ -233,20 +277,33 @@ export const useStore = create(
         return {
           orders: state.orders.map(o =>
             o.id === orderId
-              ? { ...o, status, updatedAt: new Date().toISOString() }
+              ? {
+                  ...o,
+                  status,
+                  updatedAt: new Date().toISOString(),
+                  auditHistory: [...(o.auditHistory || []), entry]
+                }
               : o
           ),
-          products: updatedProducts
+          products: updatedProducts,
+          auditLog: [entry, ...state.auditLog]
         };
-      })
+      }),
+
+      // ===== AUDIT LOG =====
+      auditLog: [],
+
+      clearAuditLog: () => set({ auditLog: [] })
+
     }),
     {
-      name: 'ecommerce-store-v6',
+      name: 'ecommerce-store-v7',
       partialize: (state) => ({
         user: state.user,
         cart: state.cart,
         orders: state.orders,
-        products: state.products
+        products: state.products,
+        auditLog: state.auditLog
       })
     }
   )

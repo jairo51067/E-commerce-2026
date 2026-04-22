@@ -11,7 +11,7 @@
 @import './welcome.css';
 @import './success.css';
 @import './dashboard.css';
-@import './profile.css';          /* ✅ NUEVO */
+@import './profile.css';
 @import './categories.css';
 @import './bottomnav.css';
 @import './responsive.css';

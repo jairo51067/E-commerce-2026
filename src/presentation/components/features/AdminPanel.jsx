@@ -100,7 +100,7 @@ export const AdminPanel = ({ isOpen, onClose, onSignOut }) => {
   };
 
   return (
-    <div className="fullscreen-panel">
+    <div className="fullscreen-panel panel-admin">
 
       {/* ===== HEADER ===== */}
       <div className="fullscreen-header">

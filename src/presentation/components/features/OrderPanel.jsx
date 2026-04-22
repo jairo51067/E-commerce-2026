@@ -4,12 +4,14 @@ import { useAuth } from '@presentation/hooks/useAuth.js';
 import { useStore } from '@presentation/store/index.js';
 import { Notifier } from '@infrastructure/utils/notifier.js';
 import { Exporter } from '@infrastructure/utils/exporter.js';
+import { AuditLogger } from '@infrastructure/utils/auditLogger.js';
 
 export const OrderPanel = ({ isOpen, onClose, onSignOut }) => {
   const { user } = useAuth();
   const orders = useStore((state) => state.orders);
   const updateOrderStatus = useStore((state) => state.updateOrderStatus);
   const [filter, setFilter] = useState('all');
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   if (!isOpen) return null;
 
@@ -28,14 +30,14 @@ export const OrderPanel = ({ isOpen, onClose, onSignOut }) => {
     .filter(o => o.status !== 'cancelled')
     .reduce((sum, o) => sum + Number(o.total), 0);
 
-  const handleExport = () => {
+   const handleExport = () => {
     try {
       if (orders.length === 0) {
         Notifier.warning('⚠️ No hay pedidos para exportar');
         return;
       }
       Exporter.ordersToCSV(orders);
-      Notifier.success('📊 Pedidos exportados a CSV!');
+      Notifier.success('📊 Pedidos exportados con auditoría!');
     } catch (error) {
       Notifier.error(error.message);
     }
@@ -43,15 +45,26 @@ export const OrderPanel = ({ isOpen, onClose, onSignOut }) => {
 
   const handleUpdateStatus = (orderId, status, message) => {
     updateOrderStatus(orderId, status);
-    Notifier.success(message);
+    Notifier.success(`${message} por ${user?.name}`);
   };
 
   const canCancel = user?.role === 'GERENTE' ||
                     user?.role === 'ADMIN' ||
                     user?.role === 'SUPERUSER';
 
+  // ✅ Obtener info de auditoría
+  const getAuditInfo = (order) => {
+    const history = order.auditHistory || [];
+    return {
+      created:   history.find(h => h.action === 'ORDER_CREATED'),
+      paid:      history.find(h => h.action === 'ORDER_PAID'),
+      shipped:   history.find(h => h.action === 'ORDER_SHIPPED'),
+      cancelled: history.find(h => h.action === 'ORDER_CANCELLED')
+    };
+  };
+
   return (
-    <div className="fullscreen-panel">
+    <div className="fullscreen-panel panel-orders">
 
       {/* ===== HEADER ===== */}
       <div className="fullscreen-header">
@@ -64,15 +77,12 @@ export const OrderPanel = ({ isOpen, onClose, onSignOut }) => {
 
         <div className="fullscreen-header-actions">
           <button className="export-btn" onClick={handleExport}>
-            📊 Exportar Informe CSV
+            📊 Exportar CSV
           </button>
           <button className="store-btn" onClick={onClose}>
-            🏪 Ir a la Tienda
+            🏪 Ir a Tienda
           </button>
-          <button
-            className="logout-btn-panel"
-            onClick={onSignOut}
-          >
+          <button className="logout-btn-panel" onClick={onSignOut}>
             🚪 Cerrar Sesión
           </button>
           <button
@@ -110,7 +120,7 @@ export const OrderPanel = ({ isOpen, onClose, onSignOut }) => {
           <span>Despachados</span>
         </div>
         <div className="stat-box" style={{background: '#F3E5F5'}}>
-          <strong style={{color: '#764ba2'}}>
+          <strong style={{color: '#0F9D58'}}>
             ${totalRevenue.toFixed(2)}
           </strong>
           <span>Ingresos</span>
@@ -145,137 +155,206 @@ export const OrderPanel = ({ isOpen, onClose, onSignOut }) => {
               </span>
             </div>
           ) : (
-            filteredOrders.map(order => (
-              <div key={order.id} className="order-card">
+            filteredOrders.map(order => {
+              const audit = getAuditInfo(order);
+              const isExpanded = expandedOrder === order.id;
 
-                {/* ORDER HEADER */}
-                <div className="order-card-header">
-                  <div>
-                    <strong>#{order.id}</strong>
-                    <span className="order-date">
-                      ⏰ {new Date(order.createdAt).toLocaleString('es-VE')}
+              return (
+                <div key={order.id} className="order-card">
+
+                  {/* ORDER HEADER */}
+                  <div className="order-card-header">
+                    <div>
+                      <strong>#{order.id}</strong>
+                      <span className="order-date">
+                        ⏰ {new Date(order.createdAt).toLocaleString('es-VE')}
+                      </span>
+                    </div>
+                    <span
+                      className="status-badge"
+                      style={{ background: STATUS[order.status]?.color }}
+                    >
+                      {STATUS[order.status]?.label}
                     </span>
                   </div>
-                  <span
-                    className="status-badge"
-                    style={{ background: STATUS[order.status]?.color }}
-                  >
-                    {STATUS[order.status]?.label}
-                  </span>
-                </div>
 
-                {/* ORDER BODY */}
-                <div className="order-card-body">
-                  <div className="order-info-grid">
-                    <p>👤 <strong>{order.customer?.name}</strong></p>
-                    <p>📞 {order.customer?.phone}</p>
-                    <p>
-                      {order.customer?.deliveryType === 'delivery'
-                        ? `🚚 Delivery: ${order.customer?.address}`
-                        : '🏪 Retiro en tienda'
-                      }
-                    </p>
-                    <p>🛒 {order.items?.length} artículos</p>
-                  </div>
+                  {/* ORDER BODY */}
+                  <div className="order-card-body">
 
-                  {/* ITEMS */}
-                  <div className="order-items">
-                    {order.items?.map(item => (
-                      <div key={item.id} className="order-item-row">
-                        <span>{item.name} × {item.quantity}</span>
-                        <span>
-                          ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* TOTALES */}
-                  <div className="order-totals">
-                    <div className="order-total-row">
-                      <span>Subtotal:</span>
-                      <span>${Number(order.subtotal).toFixed(2)}</span>
+                    {/* INFO CLIENTE */}
+                    <div className="order-info-grid">
+                      <p>👤 <strong>{order.customer?.name}</strong></p>
+                      <p>📞 {order.customer?.phone}</p>
+                      <p>
+                        {order.customer?.deliveryType === 'delivery'
+                          ? `🚚 Delivery: ${order.customer?.address}`
+                          : '🏪 Retiro en tienda'
+                        }
+                      </p>
+                      <p>🛒 {order.items?.length} artículos</p>
                     </div>
-                    {order.deliveryCost > 0 && (
-                      <div className="order-total-row">
-                        <span>🚚 Delivery:</span>
-                        <span>+${Number(order.deliveryCost).toFixed(2)}</span>
+
+                    {/* 🔐 AUDIT INFO - Último estado */}
+                    {audit.paid && order.status === 'paid' && (
+                      <div className="audit-info">
+                        💰 Marcado como pagado por <strong>{audit.paid.user.name}</strong> ({audit.paid.user.role})
+                        <br />
+                        <span>⏰ {new Date(audit.paid.timestamp).toLocaleString('es-VE')}</span>
                       </div>
                     )}
-                    <div className="order-total-row total">
-                      <strong>TOTAL:</strong>
-                      <strong style={{color: '#34C759'}}>
-                        ${Number(order.total).toFixed(2)}
-                      </strong>
-                    </div>
-                  </div>
-                </div>
 
-                {/* ACCIONES */}
-                <div className="order-actions">
-                  {order.status === 'pending' && (
-                    <>
-                      <button
-                        className="btn-paid"
-                        onClick={() => handleUpdateStatus(
-                          order.id,
-                          'paid',
-                          '✅ Pedido marcado como pagado'
-                        )}
-                      >
-                        ✅ Marcar Pagado
-                      </button>
-                      {canCancel && (
-                        <button
-                          className="btn-cancel-order"
-                          onClick={() => {
-                            if (window.confirm('¿Cancelar este pedido?')) {
-                              handleUpdateStatus(
-                                order.id,
-                                'cancelled',
-                                '❌ Pedido cancelado'
-                              );
-                            }
-                          }}
-                        >
-                          ❌ Cancelar
-                        </button>
+                    {audit.shipped && order.status === 'shipped' && (
+                      <div className="audit-info">
+                        🚚 Despachado por <strong>{audit.shipped.user.name}</strong> ({audit.shipped.user.role})
+                        <br />
+                        <span>⏰ {new Date(audit.shipped.timestamp).toLocaleString('es-VE')}</span>
+                      </div>
+                    )}
+
+                    {audit.cancelled && order.status === 'cancelled' && (
+                      <div className="audit-info" style={{borderLeftColor: '#FF3B30', background: '#ffebee'}}>
+                        ❌ Cancelado por <strong>{audit.cancelled.user.name}</strong> ({audit.cancelled.user.role})
+                        <br />
+                        <span>⏰ {new Date(audit.cancelled.timestamp).toLocaleString('es-VE')}</span>
+                      </div>
+                    )}
+
+                    {/* ITEMS */}
+                    <div className="order-items">
+                      {order.items?.map(item => (
+                        <div key={item.id} className="order-item-row">
+                          <span>{item.name} × {item.quantity}</span>
+                          <span>
+                            ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* TOTALES */}
+                    <div className="order-totals">
+                      <div className="order-total-row">
+                        <span>Subtotal:</span>
+                        <span>${Number(order.subtotal).toFixed(2)}</span>
+                      </div>
+                      {order.deliveryCost > 0 && (
+                        <div className="order-total-row">
+                          <span>🚚 Delivery:</span>
+                          <span>+${Number(order.deliveryCost).toFixed(2)}</span>
+                        </div>
                       )}
-                    </>
-                  )}
+                      <div className="order-total-row total">
+                        <strong>TOTAL:</strong>
+                        <strong style={{color: '#0F9D58'}}>
+                          ${Number(order.total).toFixed(2)}
+                        </strong>
+                      </div>
+                    </div>
 
-                  {order.status === 'paid' && (
-                    <button
-                      className="btn-ship"
-                      onClick={() => {
-                        if (window.confirm('¿Confirmar despacho del pedido?')) {
-                          handleUpdateStatus(
-                            order.id,
-                            'shipped',
-                            '🚚 Pedido despachado!'
-                          );
+                    {/* 🔐 HISTORIAL COMPLETO */}
+                    {isExpanded && order.auditHistory && order.auditHistory.length > 0 && (
+                      <div className="audit-history">
+                        <div className="audit-history-title">
+                          📜 Historial de acciones ({order.auditHistory.length})
+                        </div>
+                        {order.auditHistory.map(entry => (
+                          <div key={entry.id} className="audit-entry">
+                            <span className="audit-entry-icon">
+                              {AuditLogger.getActionIcon(entry.action)}
+                            </span>
+                            <div className="audit-entry-content">
+                              <strong>
+                                {AuditLogger.getActionLabel(entry.action)} - {entry.user.name}
+                              </strong>
+                              <span>
+                                {entry.user.role} • {new Date(entry.timestamp).toLocaleString('es-VE')}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* TOGGLE HISTORIAL */}
+                    {order.auditHistory && order.auditHistory.length > 0 && (
+                      <button
+                        className="audit-toggle-btn"
+                        onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+                      >
+                        {isExpanded
+                          ? '▲ Ocultar historial'
+                          : `▼ Ver historial (${order.auditHistory.length} acciones)`
                         }
-                      }}
-                    >
-                      🚚 Despachar Pedido
-                    </button>
-                  )}
+                      </button>
+                    )}
+                  </div>
 
-                  {order.status === 'shipped' && (
-                    <div className="shipped-label">
-                      ✅ Pedido Despachado - Completado
-                    </div>
-                  )}
+                  {/* ACCIONES */}
+                  <div className="order-actions">
+                    {order.status === 'pending' && (
+                      <>
+                        <button
+                          className="btn-paid"
+                          onClick={() => handleUpdateStatus(
+                            order.id,
+                            'paid',
+                            '✅ Pedido marcado como pagado'
+                          )}
+                        >
+                          ✅ Marcar Pagado
+                        </button>
+                        {canCancel && (
+                          <button
+                            className="btn-cancel-order"
+                            onClick={() => {
+                              if (window.confirm('¿Cancelar este pedido?\n\nSe registrará tu acción.')) {
+                                handleUpdateStatus(
+                                  order.id,
+                                  'cancelled',
+                                  '❌ Pedido cancelado'
+                                );
+                              }
+                            }}
+                          >
+                            ❌ Cancelar
+                          </button>
+                        )}
+                      </>
+                    )}
 
-                  {order.status === 'cancelled' && (
-                    <div className="cancelled-label">
-                      ❌ Pedido Cancelado
-                    </div>
-                  )}
+                    {order.status === 'paid' && (
+                      <button
+                        className="btn-ship"
+                        onClick={() => {
+                          if (window.confirm('¿Confirmar despacho del pedido?\n\nSe registrará tu acción.')) {
+                            handleUpdateStatus(
+                              order.id,
+                              'shipped',
+                              '🚚 Pedido despachado!'
+                            );
+                          }
+                        }}
+                      >
+                        🚚 Despachar Pedido
+                      </button>
+                    )}
+
+                    {order.status === 'shipped' && (
+                      <div className="shipped-label">
+                        ✅ Pedido Despachado - Completado
+                      </div>
+                    )}
+
+                                       {order.status === 'cancelled' && (
+                      <div className="cancelled-label">
+                        ❌ Pedido Cancelado
+                      </div>
+                    )}
+                  </div>
+
                 </div>
-
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
