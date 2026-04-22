@@ -196,7 +196,7 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
                 <span className="profile-item-icon">🌐</span>
                 <div className="profile-item-content">
                   <strong>¿Quieres tu tienda?</strong>
-                  <span>vendeya.app</span>
+                  <span>vendemas-landing.vercel.app</span>
                 </div>
                 <span className="profile-item-arrow">→</span>
               </a>

@@ -18,16 +18,17 @@ export const STORE_CONFIG = {
   // 🚀 IDENTIDAD DE LA PLATAFORMA (VendeYa)
   // ═══════════════════════════════════════════
   platform: {
-    name:        'VendeYa',
-    tagline:     'Tu tienda online en 5 minutos',
-    slogan:      'Del catálogo a la venta, sin fricciones',
-    version:     '1.0.0',
-    build:       '2026.01',
-    logo:        '⚡',
-    website:     'https://vendeya.app',
-    email:       'hola@vendeya.app',
-    copyright:   'VendeYa™ - Todos los derechos reservados'
-  },
+  name:     'VendeMás',           // ← Cambio
+  tagline:  'Tu tienda online en minutos',
+  slogan:   'Del catálogo a la venta, sin fricciones',
+  version:  '1.0.0',
+  build:    '2026.01',
+  logo:     '⚡',
+  website:  'https://vendemas-landing.vercel.app',  // ← Tu nueva landing
+  email:    'jairo.cardenas.dev@gmail.com',
+  whatsapp: '584127055024',
+  copyright: 'VendeMás™ - Todos los derechos reservados'
+},
 
   // ═══════════════════════════════════════════
   // 🏪 DATOS DE LA TIENDA (cliente final)
