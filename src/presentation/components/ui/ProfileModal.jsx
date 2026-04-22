@@ -201,7 +201,7 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
                 🚪 Cerrar sesión
               </button>
             ) : (
-              /* Aquí comentamos el botón de iniciar sesión - esta es la foma de comtarlo*/ 
+              /* Aquí comentamos el botón de iniciar sesión - esta es la foma de comtarlo*/
               /*
               <button
                 className="profile-login-btn"
@@ -213,7 +213,8 @@ export const ProfileModal = ({ isOpen, onClose, user, onSignOut, onOpenLogin }) 
                 🔐 Iniciar sesión
               </button>
               */
-             null // Ponemos null porque React necesita que el bloque retorne algo
+              null // Ponemos null porque React necesita que el bloque retorne algo El null: 
+              //Como estás dentro de un operador ternario (condicion ? casoA : casoB), React espera que si no hay un botón en el "caso B", devuelvas algo. Al poner null, le dices que no renderice nada en absoluto.
             )}
 
             {/* FOOTER */}
