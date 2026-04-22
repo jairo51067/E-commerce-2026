@@ -1,4 +1,4 @@
-/* ===== BOTTOM NAV - REEMPLAZAR COMPLETO ===== */
+/* ===== BOTTOM NAV ===== */
 .bottom-nav {
   display: none;
   position: fixed;
@@ -17,74 +17,87 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.15rem;
+  justify-content: center;
+  gap: 0.2rem;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0.4rem 0.25rem;
   color: #666;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 500;
   transition: all 0.2s;
   position: relative;
   min-width: 0;
+  font-family: inherit;
 }
 
-.bottom-nav-item span:first-child {
-  font-size: 1.3rem;
+/* ✅ Icono del bottom nav con tamaño controlado */
+.bottom-nav-item > span:first-child {
+  font-size: 1.35rem;
   line-height: 1;
+  display: inline-block;
 }
 
-.bottom-nav-item span:last-child {
+/* ✅ Texto del bottom nav */
+.bottom-nav-item > span:last-child {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  font-size: 0.68rem;
 }
 
 .bottom-nav-item.active {
   color: #667eea;
 }
 
-.bottom-nav-item.active span:first-child {
-  transform: scale(1.1);
+.bottom-nav-item.active > span:first-child {
+  transform: scale(1.08);
 }
 
 .bottom-nav-item:active {
   transform: scale(0.95);
 }
 
-/* ===== NAV BADGE PROPORCIONADO ===== */
+/* ===== 🛒 NAV ICON WRAPPER + BADGE CORREGIDO ===== */
 .nav-icon-wrap {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: auto;
+  height: auto;
   line-height: 1;
+  font-size: 1.35rem;
 }
 
+/* ✅ BADGE PROPORCIONADO - pequeño, elegante, NO cubre el ícono */
 .nav-badge {
   position: absolute;
-  top: -6px;
+  top: -7px;
   right: -10px;
   background: #FF3B30;
   color: white;
-  border-radius: 10px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  font-size: 0.62rem;
+  border-radius: 999px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 0.58rem;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  border: 1.5px solid white;
   line-height: 1;
   box-sizing: border-box;
   letter-spacing: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  pointer-events: none;
 }
 
+/* ===== RESPONSIVE MOBILE ===== */
 @media (max-width: 768px) {
   .bottom-nav {
     display: flex;
@@ -96,5 +109,32 @@
 
   .app-footer {
     margin-bottom: 75px;
+  }
+
+  /* En mobile: icono un poco más grande */
+  .bottom-nav-item > span:first-child {
+    font-size: 1.4rem;
+  }
+
+  .nav-icon-wrap {
+    font-size: 1.4rem;
+  }
+
+  .nav-badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.58rem;
+    top: -6px;
+    right: -9px;
+  }
+}
+
+@media (max-width: 380px) {
+  .bottom-nav-item > span:last-child {
+    font-size: 0.62rem;
+  }
+
+  .bottom-nav-item > span:first-child {
+    font-size: 1.3rem;
   }
 }
