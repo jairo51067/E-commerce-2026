@@ -231,12 +231,11 @@ function App() {
           </div>
 
           {searchQuery && (
-  <button
-    className="search-clear"
-    onClick={() => setSearchQuery('')}
-    aria-label="Limpiar búsqueda"
-  />
-)}
+            <p className="search-results">
+              🔍 {filteredProducts.length} resultado(s) para
+              " <strong>{searchQuery}</strong> "
+            </p>
+          )}
 
           <div className="products-grid">
             {filteredProducts.length > 0 ? (
