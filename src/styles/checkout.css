@@ -55,6 +55,7 @@
   flex-shrink: 0;
   background: white;
   padding: 1.25rem 1.5rem 1rem 1.5rem;
+  margin-top: 1.5rem;
   border-bottom: 1px solid #f0f0f0;
   display: flex;
   justify-content: space-between;
