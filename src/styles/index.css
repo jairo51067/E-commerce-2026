@@ -10,7 +10,8 @@
 @import './toast.css';
 @import './welcome.css';
 @import './success.css';
-@import './dashboard.css';      /* ✅ NUEVO */
+@import './dashboard.css';
+@import './profile.css';          /* ✅ NUEVO */
 @import './categories.css';
 @import './bottomnav.css';
 @import './responsive.css';

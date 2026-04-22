@@ -1,4 +1,4 @@
-/* ===== BOTTOM NAV ===== */
+/* ===== BOTTOM NAV - REEMPLAZAR COMPLETO ===== */
 .bottom-nav {
   display: none;
   position: fixed;
@@ -7,79 +7,6 @@
   right: 0;
   background: white;
   border-top: 1px solid #eee;
-  padding: 0.5rem 0;
-  z-index: 500;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-}
-
-.bottom-nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.4rem;
-  color: #666;
-  font-size: 0.7rem;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.bottom-nav-item span:first-child {
-  font-size: 1.4rem;
-}
-
-.bottom-nav-item.active {
-  color: var(--primary);
-}
-
-.bottom-nav-item:hover {
-  color: var(--primary);
-}
-
-.nav-icon-wrap {
-  position: relative;
-  display: inline-block;
-}
-
-.nav-badge {
-  position: absolute;
-  top: -6px;
-  right: -8px;
-  background: var(--danger);
-  color: white;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@media (max-width: 768px) {
-  .bottom-nav {
-    display: flex;
-  }
-
-  .app-main {
-    padding-bottom: 70px;
-  }
-}
-
-/* ===== BOTTOM NAV ===== */
-.bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  border-top: 1px solid var(--gray-300);
   padding: 0.4rem 0 0.6rem 0;
   z-index: 500;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
@@ -95,11 +22,12 @@
   border: none;
   cursor: pointer;
   padding: 0.4rem 0.25rem;
-  color: var(--gray-500);
+  color: #666;
   font-size: 0.65rem;
   font-weight: 500;
-  transition: var(--transition);
-  font-family: var(--font-family);
+  transition: all 0.2s;
+  position: relative;
+  min-width: 0;
 }
 
 .bottom-nav-item span:first-child {
@@ -107,19 +35,26 @@
   line-height: 1;
 }
 
+.bottom-nav-item span:last-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 .bottom-nav-item.active {
-  color: var(--primary);
+  color: #667eea;
 }
 
 .bottom-nav-item.active span:first-child {
-  transform: scale(1.15);
+  transform: scale(1.1);
 }
 
-.bottom-nav-item:hover {
-  color: var(--primary);
+.bottom-nav-item:active {
+  transform: scale(0.95);
 }
 
-/* ===== NAV BADGE ===== */
+/* ===== NAV BADGE CORREGIDO (más pequeño) ===== */
 .nav-icon-wrap {
   position: relative;
   display: inline-flex;
@@ -129,12 +64,12 @@
 
 .nav-badge {
   position: absolute;
-  top: -6px;
-  right: -8px;
-  background: var(--danger);
+  top: -8px;
+  right: -10px;
+  background: #FF3B30;
   color: white;
-  border-radius: var(--radius-full);
-  width: 16px;
+  border-radius: 10px;
+  min-width: 16px;
   height: 16px;
   font-size: 0.6rem;
   font-weight: 700;
@@ -142,9 +77,11 @@
   align-items: center;
   justify-content: center;
   border: 1.5px solid white;
+  padding: 0 4px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .bottom-nav {
     display: flex;

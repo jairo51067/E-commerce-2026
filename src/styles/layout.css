@@ -38,6 +38,64 @@
   letter-spacing: -0.5px;
 }
 
+/* ===== HEADER MOBILE FIX ===== */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .header-right.mobile-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* ✅ Iconos header mobile SIMÉTRICOS */
+  .header-right.mobile-nav .cart-toggle,
+  .header-right.mobile-nav .hamburger {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    font-size: 1.2rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+    position: relative;
+  }
+
+  .header-right.mobile-nav .cart-toggle:hover,
+  .header-right.mobile-nav .hamburger:hover {
+    background: rgba(255,255,255,0.25);
+    transform: scale(1.05);
+  }
+
+  /* ✅ Cart count en header más pequeño */
+  .header-right.mobile-nav .cart-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #FF3B30;
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #667eea;
+    padding: 0 4px;
+    box-sizing: border-box;
+  }
+}
+
 /* DESKTOP NAV */
 .desktop-nav {
   display: flex;

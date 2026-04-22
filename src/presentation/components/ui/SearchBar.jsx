@@ -28,11 +28,17 @@ export const SearchBar = ({ onSearch, onClose }) => {
             </button>
           )}
         </div>
+
+        {/* ✅ Botón X simétrico */}
         <button
-          className="search-cancel"
-          onClick={onClose}
+          className="search-close-btn"
+          onClick={() => {
+            setQuery('');
+            onClose();
+          }}
+          title="Cerrar búsqueda"
         >
-          Cancelar
+          ✕
         </button>
       </div>
     </div>

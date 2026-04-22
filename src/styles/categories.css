@@ -73,93 +73,66 @@
   transform: translateY(-2px);
 }
 
-/* ===== SEARCH OVERLAY MOBILE ===== */
+/* ===== SEARCH OVERLAY MOBILE - REEMPLAZAR COMPLETO ===== */
 .search-overlay {
   position: fixed;
   top: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   z-index: 999;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease;
+  animation: slideDown 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  padding: 0.75rem;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
 }
 
 .search-container {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: white;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  background: var(--gray-100);
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
   gap: 0.5rem;
-  flex: 1;
-  border: 1.5px solid var(--gray-300);
-  transition: border-color 0.2s;
+  max-width: 100%;
 }
 
-.search-bar:focus-within {
-  border-color: var(--primary);
+.search-container .search-bar {
+  flex: 1;
+  margin: 0;
   background: white;
+  border-radius: 12px;
+  padding: 0.6rem 0.85rem;
+  min-width: 0;
 }
 
-.search-bar input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 0.95rem;
-  color: var(--gray-800);
-  background: transparent;
-  font-family: var(--font-family);
-}
-
-.search-bar input::placeholder {
-  color: var(--gray-500);
-}
-
-.search-bar span {
+/* ✅ Botón X simétrico en mobile */
+.search-close-btn {
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.2);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 12px;
+  color: white;
   font-size: 1.1rem;
-  color: var(--gray-500);
-}
-
-.search-clear {
-  background: var(--gray-300);
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  font-weight: 700;
   cursor: pointer;
-  font-size: 0.7rem;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--gray-700);
-  transition: var(--transition);
-  flex-shrink: 0;
+  transition: all 0.2s;
+  padding: 0;
 }
 
-.search-clear:hover {
-  background: var(--danger);
-  color: white;
+.search-close-btn:hover {
+  background: rgba(255,59,48,0.5);
+  transform: scale(1.05);
 }
 
+/* ❌ Eliminar el botón "Cancelar" de texto en mobile */
 .search-cancel {
-  background: none;
-  border: none;
-  color: var(--primary);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  padding: 0.5rem;
+  display: none;
 }
-
 /* ===== DESKTOP SEARCH ===== */
 .desktop-search {
   margin: 0 1rem 1rem 1rem;

@@ -3,10 +3,12 @@ import { useStore } from '@presentation/store/index.js';
 import { useAuth } from '@presentation/hooks/useAuth.js';
 
 export const BottomNav = ({
+  onGoHome,
   onOpenCart,
   onOpenSearch,
   onOpenOrders,
   onOpenAdmin,
+  onOpenProfile,
   activeTab,
   setActiveTab
 }) => {
@@ -26,10 +28,13 @@ export const BottomNav = ({
   return (
     <nav className="bottom-nav">
 
-      {/* INICIO */}
+      {/* INICIO - ✅ Ahora funcional */}
       <button
         className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-        onClick={() => setActiveTab('home')}
+        onClick={() => {
+          setActiveTab('home');
+          onGoHome();
+        }}
       >
         <span>🏠</span>
         <span>Inicio</span>
@@ -59,7 +64,7 @@ export const BottomNav = ({
           <span className="nav-icon-wrap">
             🛒
             {cartQty > 0 && (
-              <span className="nav-badge">{cartQty}</span>
+              <span className="nav-badge">{cartQty > 99 ? '99+' : cartQty}</span>
             )}
           </span>
           <span>Carrito</span>
@@ -80,7 +85,7 @@ export const BottomNav = ({
         </button>
       )}
 
-      {/* ADMIN - Solo admin/super */}
+      {/* ADMIN */}
       {(user?.role === 'ADMIN' || user?.role === 'SUPERUSER') && (
         <button
           className={`bottom-nav-item ${activeTab === 'admin' ? 'active' : ''}`}
@@ -97,9 +102,12 @@ export const BottomNav = ({
       {/* PERFIL */}
       <button
         className={`bottom-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
-        onClick={() => setActiveTab('profile')}
+        onClick={() => {
+          setActiveTab('profile');
+          onOpenProfile();
+        }}
       >
-        <span>{user ? '👤' : '👤'}</span>
+        <span>👤</span>
         <span>{user ? user.name.split(' ')[0] : 'Perfil'}</span>
       </button>
 

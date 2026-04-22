@@ -1,0 +1,344 @@
+/* ===== PROFILE OVERLAY ===== */
+.profile-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 9000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.profile-overlay.visible {
+  opacity: 1;
+}
+
+/* ===== PROFILE MODAL ===== */
+.profile-modal {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.profile-modal.visible {
+  transform: translateY(0);
+}
+
+/* ===== HEADER ===== */
+.profile-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  border: 3px solid rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
+
+.profile-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-header-info h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-header-info p {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.82rem;
+  opacity: 0.9;
+}
+
+.profile-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.profile-close-btn:hover {
+  background: rgba(255,59,48,0.5);
+}
+
+/* ===== LIST ===== */
+.profile-list {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.profile-section {
+  margin-bottom: 1.25rem;
+}
+
+.profile-section-title {
+  font-size: 0.7rem;
+  color: #999;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 0.5rem 0.75rem;
+}
+
+.profile-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  background: #f8f9fa;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+  transition: all 0.2s;
+  text-align: left;
+  font-family: inherit;
+}
+
+.profile-item:hover:not(.info-item) {
+  background: #eef2ff;
+  transform: translateX(4px);
+}
+
+.profile-item.info-item {
+  cursor: default;
+}
+
+.profile-item-icon {
+  font-size: 1.4rem;
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.profile-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-item-content strong {
+  display: block;
+  color: #333;
+  font-size: 0.9rem;
+  margin-bottom: 0.15rem;
+  font-weight: 600;
+}
+
+.profile-item-content span {
+  display: block;
+  color: #777;
+  font-size: 0.78rem;
+}
+
+.profile-item-arrow {
+  color: #999;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ===== QR SECTION ===== */
+.qr-section {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qr-wrapper {
+  background: white;
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border: 3px solid #f0f0f0;
+}
+
+.qr-wrapper img {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+}
+
+.qr-info {
+  color: #666;
+  font-size: 0.88rem;
+  margin: 0;
+  max-width: 280px;
+  line-height: 1.4;
+}
+
+.qr-close-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.qr-close-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+}
+
+/* ===== LOGOUT/LOGIN BUTTONS ===== */
+.profile-logout-btn,
+.profile-login-btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+  font-family: inherit;
+}
+
+.profile-logout-btn {
+  background: linear-gradient(135deg, #FF3B30, #CC0000);
+  color: white;
+}
+
+.profile-logout-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(255,59,48,0.3);
+}
+
+.profile-login-btn {
+  background: linear-gradient(135deg, #34C759, #28A745);
+  color: white;
+}
+
+.profile-login-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(52,199,89,0.3);
+}
+
+/* ===== FOOTER ===== */
+.profile-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+  color: #999;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.profile-footer span {
+  font-size: 0.72rem;
+  color: #bbb;
+}
+
+/* ===== RESPONSIVE DESKTOP ===== */
+@media (min-width: 769px) {
+  .profile-overlay {
+    align-items: center;
+  }
+
+  .profile-modal {
+    border-radius: 24px;
+    max-height: 85vh;
+  }
+
+  .profile-modal.visible {
+    transform: scale(1);
+  }
+
+  .profile-modal {
+    transform: scale(0.9);
+  }
+}
+
+/* ===== RESPONSIVE MOBILE SMALL ===== */
+@media (max-width: 380px) {
+  .profile-header {
+    padding: 1.25rem 1rem;
+  }
+
+  .profile-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  .profile-header-info h2 {
+    font-size: 1rem;
+  }
+
+  .profile-list {
+    padding: 0.75rem;
+  }
+
+  .profile-item {
+    padding: 0.7rem;
+  }
+
+  .profile-item-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+  }
+
+  .profile-item-content strong {
+    font-size: 0.85rem;
+  }
+
+  .profile-item-content span {
+    font-size: 0.72rem;
+  }
+}
