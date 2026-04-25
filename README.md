@@ -1,49 +1,52 @@
-# 🛒 E-commerce 2026 | Modern Shopping Experience
+🛒 E-commerce 2026 | Modern Shopping Experience
+Una plataforma de comercio electrónico de alto rendimiento construida bajo los principios de Clean Architecture. Este proyecto no solo se enfoca en la interfaz de usuario, sino en una separación de responsabilidades robusta que permite escalabilidad, pruebas unitarias sencillas y un mantenimiento ágil.
 
-![Vite](https://img.shields.io/badge/frontend-Vite-646CFF?logo=vite&logoColor=white)
-![JavaScript](https://img.shields.io/badge/language-JavaScript-F7DF1E?logo=javascript&logoColor=black)
-![CSS3](https://img.shields.io/badge/style-CSS3-1572B6?logo=css3&logoColor=white)
-![Vercel](https://img.shields.io/badge/deploy-Vercel-000000?logo=vercel&logoColor=white)
+🔗 Demo en vivo | 📂 Documentación Técnica
 
-Una plataforma de comercio electrónico moderna, rápida y responsive, construida con un enfoque en rendimiento y experiencia de usuario. Este proyecto demuestra el uso de arquitectura modular en JavaScript y despliegue continuo.
+🚀 Stack Tecnológico y Arquitectura
+Para este proyecto se implementó una estructura desacoplada que garantiza un producto final ligero y profesional:
 
-🔗 **Demo en vivo:** [E-commerce 2026](https://e-commerce-2026-peach.vercel.app)
+Frontend Core: React / JavaScript (ES6+) con Vite para optimización de assets.
 
----
+Gestión de Estado: Store centralizado con composición de Providers.
 
-## 🚀 Stack Tecnológico
+Arquitectura: Diseño por capas (Presentation, Application, Domain, Infrastructure).
 
-Para este proyecto, se seleccionaron tecnologías que garantizan un desarrollo ágil y un producto final ligero:
+Estilos: CSS3 Moderno (Flexbox & Grid) con enfoque Adaptive.
 
-* **Core:** [JavaScript (ES6+)](https://developer.mozilla.org/es/docs/Web/JavaScript) - Lógica de negocio y manipulación dinámica del DOM.
-* **Herramienta de Construcción:** [Vite](https://vitejs.dev/) - Utilizado para una experiencia de desarrollo instantánea y optimización de assets para producción.
-* **Estilos:** [CSS3 Moderno](https://developer.mozilla.org/es/docs/Web/CSS) - Implementación de layouts complejos mediante Flexbox y CSS Grid, asegurando un diseño 100% responsivo.
-* **Despliegue:** [Vercel](https://vercel.com/) - Configurado con CI/CD para actualizaciones automáticas desde la rama `main`.
+Persistencia: LocalStorage Adapter para persistencia de sesión y carrito.
 
----
+Integraciones: WhatsApp Service para finalización de pedidos.
 
-## 🛠️ Funcionalidades Clave
+🏗️ Arquitectura del Sistema
+El proyecto sigue un flujo de datos unidireccional y modular, como se detalla en el diagrama de arquitectura:
 
-* **Catálogo Dinámico:** Renderizado eficiente de productos desde fuentes de datos locales o APIs.
-* **Carrito de Compras:** Gestión de estado persistente para que el usuario no pierda su selección al recargar.
-* **Diseño Adaptive:** Experiencia optimizada para móviles, tablets y escritorio.
-* **Optimización de Carga:** Gracias a Vite, los recursos se cargan bajo demanda, mejorando el First Contentful Paint (FCP).
+Capa de Presentación (Presentation): Maneja la UI y la lógica de los componentes (ProductsPage, CartPage, AdminPage). Utiliza Hooks personalizados (useCart, useAuth, usePermissions) para interactuar con la lógica de negocio.
 
----
+Capa de Aplicación (Application): Orquesta los casos de uso como processOrder y addToCart a través de servicios dedicados.
 
-## 📂 Estructura del Proyecto
+Capa de Dominio (Domain): Contiene la lógica esencial del negocio, entidades (Product, Order, User) y reglas de validación (RBAC).
 
-```text
-E-commerce-2026/
-├── src/                # Código fuente de la aplicación
-│   ├── assets/         # Imágenes y recursos estáticos
-│   ├── components/     # Componentes reutilizables de UI
-│   └── main.js         # Punto de entrada de la aplicación
-├── index.html          # Estructura base
-├── vite.config.js      # Configuración del empaquetador
-└── package.json        # Dependencias y scripts
+Capa de Infraestructura (Infrastructure): Gestiona las herramientas externas, adaptadores de almacenamiento y servicios de mensajería (WhatsApp integration).
+
+🛠️ Funcionalidades Clave
+Catálogo Inteligente: Renderizado eficiente con búsqueda dinámica mediante SearchBar.
+
+Gestión de Carrito: Persistencia total de datos y resumen detallado en el MiniCart.
+
+Control de Acceso (RBAC): Sistema de permisos mediante usePermissions para proteger la zona de administración.
+
+Checkout Optimizado: Integración con servicios externos para la gestión de órdenes.
+
+📂 Estructura del Proyecto
+Plaintext
+src/
+├── presentation/     # Componentes de UI, Pages y Hooks
+├── application/      # Servicios y Casos de Uso (Business Logic)
+├── domain/           # Entidades, Contratos y Reglas de Negocio
+├── infrastructure/   # Adaptadores (Storage, API, WhatsApp)
+└── store/            # Configuración y estado global
 
 👤 Autor
 Jairo Antonio Cárdenas M.
-GitHub: @jairo51067
-
+Full Stack Developer & Product Manager
