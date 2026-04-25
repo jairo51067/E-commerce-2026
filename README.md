@@ -72,6 +72,19 @@ src/
 
 ---
 
+## 📖 Guía Rápida de Uso
+
+Para una experiencia óptima en la plataforma, sigue estos pasos clave:
+
+* **🔍 Exploración:** Utiliza la `SearchBar` para filtrar el catálogo en tiempo real. La arquitectura modular permite búsquedas instantáneas sin recargar la página.
+* **🛒 Gestión de Compra:** Añade productos al carrito. Gracias a nuestro `LocalStorage Adapter`, tu selección permanecerá guardada incluso si cierras el navegador.
+* **🚀 Finalización de Orden:** Haz clic en "Procesar Orden" en el carrito para activar el `OrderService`, el cual generará un resumen listo para ser enviado vía WhatsApp.
+* **🛡️ Acceso Administrativo:** Para gestionar el inventario, accede a la sección Admin (requiere permisos validados por nuestro sistema RBAC).
+
+> 💡 **¿Necesitas más detalles?** Consulta nuestro [Manual de Usuario Completo en la Wiki](../../wiki).
+
+---
+
 ## ⚙️ Instalación y Configuración
 
 ```bash
