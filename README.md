@@ -83,6 +83,8 @@ Para una experiencia óptima en la plataforma, sigue estos pasos clave:
 
 > 💡 **¿Necesitas más detalles?** Consulta nuestro [Manual de Usuario Completo en la Wiki](../../wiki).
 
+> > 📚 **¿Eres desarrollador o quieres conocer más?** Visita nuestra [Wiki Técnica](../../wiki) para ver diagramas de flujo, lógica de servicios y guías de contribución.
+
 ---
 
 ## ⚙️ Instalación y Configuración
