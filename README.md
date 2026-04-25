@@ -1,52 +1,109 @@
-🛒 E-commerce 2026 | Modern Shopping Experience
-Una plataforma de comercio electrónico de alto rendimiento construida bajo los principios de Clean Architecture. Este proyecto no solo se enfoca en la interfaz de usuario, sino en una separación de responsabilidades robusta que permite escalabilidad, pruebas unitarias sencillas y un mantenimiento ágil.
+# 🛒 E-commerce 2026 | Modern Shopping Experience
 
-🔗 Demo en vivo | 📂 Documentación Técnica
+<div align="center">
 
-🚀 Stack Tecnológico y Arquitectura
-Para este proyecto se implementó una estructura desacoplada que garantiza un producto final ligero y profesional:
+![GitHub Repo Size](https://img.shields.io/github/repo-size/jairo51067/ecommerce-2026?style=for-the-badge&color=blue)
+![Vercel Status](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![JS](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 
-Frontend Core: React / JavaScript (ES6+) con Vite para optimización de assets.
+**Una solución de comercio electrónico robusta, escalable y diseñada bajo principios de Clean Architecture.**
 
-Gestión de Estado: Store centralizado con composición de Providers.
+[Explorar Demo en Vivo 🚀](https://tu-link.vercel.app) • [Reportar Bug 🐛](https://github.com/jairo51067/ecommerce-2026/issues) • [Solicitar Feature ✨](https://github.com/jairo51067/ecommerce-2026/issues)
 
-Arquitectura: Diseño por capas (Presentation, Application, Domain, Infrastructure).
+</div>
 
-Estilos: CSS3 Moderno (Flexbox & Grid) con enfoque Adaptive.
+---
 
-Persistencia: LocalStorage Adapter para persistencia de sesión y carrito.
+## 📖 Descripción General
 
-Integraciones: WhatsApp Service para finalización de pedidos.
+**E-commerce 2026** no es solo una tienda virtual; es un ecosistema desarrollado con un enfoque en **rendimiento extremo** y **mantenibilidad**. Utilizando una arquitectura desacoplada, el proyecto garantiza una experiencia de usuario fluida y un código preparado para el crecimiento empresarial.
 
-🏗️ Arquitectura del Sistema
-El proyecto sigue un flujo de datos unidireccional y modular, como se detalla en el diagrama de arquitectura:
+### 🎯 Objetivos Logrados:
+* **Performance:** Optimización de *Core Web Vitals* mediante carga bajo demanda.
+* **Escalabilidad:** Separación estricta de lógica de negocio y UI (Clean Architecture).
+* **UX/UI:** Diseño adaptable con enfoque *mobile-first* y estados persistentes.
 
-Capa de Presentación (Presentation): Maneja la UI y la lógica de los componentes (ProductsPage, CartPage, AdminPage). Utiliza Hooks personalizados (useCart, useAuth, usePermissions) para interactuar con la lógica de negocio.
+---
 
-Capa de Aplicación (Application): Orquesta los casos de uso como processOrder y addToCart a través de servicios dedicados.
+## 🏗️ Arquitectura del Sistema (Clean Architecture)
 
-Capa de Dominio (Domain): Contiene la lógica esencial del negocio, entidades (Product, Order, User) y reglas de validación (RBAC).
+El proyecto se estructura en capas independientes, permitiendo que la lógica de negocio sea ajena a los cambios en la tecnología de la interfaz o bases de datos.
 
-Capa de Infraestructura (Infrastructure): Gestiona las herramientas externas, adaptadores de almacenamiento y servicios de mensajería (WhatsApp integration).
+| Capa | Responsabilidad | Tecnologías Clave |
+| :--- | :--- | :--- |
+| **Presentation** 📱 | Interfaz de usuario, gestión de rutas y hooks de estado. | React, Vite, CSS Grid/Flexbox |
+| **Application** ⚙️ | Orquestación de casos de uso (Orders, Cart, Auth). | Services & Use Cases |
+| **Domain** 🧠 | Entidades de negocio, reglas de validación y RBAC. | Logic, Entities, Permissions |
+| **Infrastructure** 🔌 | Adaptadores externos y persistencia de datos. | LocalStorage, WhatsApp API |
 
-🛠️ Funcionalidades Clave
-Catálogo Inteligente: Renderizado eficiente con búsqueda dinámica mediante SearchBar.
+---
 
-Gestión de Carrito: Persistencia total de datos y resumen detallado en el MiniCart.
+## 🛠️ Stack Tecnológico
 
-Control de Acceso (RBAC): Sistema de permisos mediante usePermissions para proteger la zona de administración.
+* **Frontend:** JavaScript ES6+ / React.
+* **Tooling:** Vite (Build tool ultra-rápida).
+* **State Management:** Context API con arquitectura de composición de Providers.
+* **Seguridad:** Sistema de permisos basado en roles (RBAC).
+* **Integraciones:** Servicio de mensajería vía WhatsApp para cierre de ventas.
 
-Checkout Optimizado: Integración con servicios externos para la gestión de órdenes.
+---
 
-📂 Estructura del Proyecto
-Plaintext
+## 📂 Estructura del Repositorio
+
+```bash
 src/
-├── presentation/     # Componentes de UI, Pages y Hooks
-├── application/      # Servicios y Casos de Uso (Business Logic)
-├── domain/           # Entidades, Contratos y Reglas de Negocio
-├── infrastructure/   # Adaptadores (Storage, API, WhatsApp)
-└── store/            # Configuración y estado global
+├── presentation/     # 🎨 UI: Components, Pages, Hooks, Layouts
+├── application/      # ⚡ Logic: Services (Auth, Cart, Order)
+├── domain/           # 🏛️ Core: Entities, Permissions, Contracts
+├── infrastructure/   # 🛠️ Tools: LocalStorage, API Adapters, Utils
+└── store/            # 📦 State: Global config & Providers
+```
 
-👤 Autor
-Jairo Antonio Cárdenas M.
-Full Stack Developer & Product Manager
+---
+
+## ✨ Funcionalidades Destacadas
+
+* ✅ **Carrito Persistente:** Los datos sobreviven a recargas del navegador mediante adaptadores de infraestructura.
+* ✅ **Admin Dashboard:** Protegido por guardias de permisos (`usePermissions`).
+* ✅ **Búsqueda Dinámica:** Filtrado de productos en tiempo real optimizado.
+* ✅ **Checkout Estratégico:** Integración directa a WhatsApp para aumentar la tasa de conversión.
+
+---
+
+## ⚙️ Instalación y Configuración
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/jairo51067/ecommerce-2026.git
+
+# 2. Entrar al directorio
+cd ecommerce-2026
+
+# 3. Instalar dependencias
+npm install
+
+# 4. Iniciar entorno de desarrollo
+npm run dev
+```
+
+---
+
+## 👤 Autor
+
+**Jairo Antonio Cárdenas M.**
+*Full Stack Developer & Product Manager*
+
+<div align="left">
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/tu-usuario)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jairo51067)
+
+</div>
+
+---
+
+<div align="center">
+Desarrollado con ❤️ en San Cristóbal, Venezuela. 2026.
+</div>
